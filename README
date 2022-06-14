@@ -1,0 +1,43 @@
+Geschwindigkeit:
+1. SortTest_CLang - Clang + lld      (LLVM linker)
+2. SortTest_GCC   - GCC   + ld       (GNU linker)
+3. SortTest_CL    - CL    + link     (Microsoft)
+4. SortTest_CLC   - CL    + Crinkler     nur 5,7 kilobytes!!
+
+SortTest  v5:
+    - Liste aus csv auslesen
+    - csv kann als parameter übergeben werden 
+    - Liste mit commands erstellen
+        - fill,n             Fülle Liste von 0-n.
+        - fill_reversed,n    Fülle Liste von n-0.
+        - fill_random,n      Fülle Liste von 0-n und randomisiere Elemente.
+        - random,n           Fülle Liste mit zufälligen elementen zwischen 0,(n*10).
+
+    - Verschiedene Sortieralgorithmen
+        - Bad_Bubblesort     gehe für jedes Element durchh die ganze Liste, wenn Element (n>n+1) vertausche die Elemente.
+        - Bubblesort         Bubblesort aber läuft jedesmal nur durch Teiliste und nurr solange noch vertauschungen durchgeführt wurden.
+        - Selectionsort      Wähle das kleinste Element der Teilliste und setze es an den Anfang.
+        - Stalinsort         Entferne alle, die aus der Reihe tanzen. -.-
+        - LSD_RadixSort      LSD_RadixSort Radixbasis = 2
+        - InsertionSort      Schiebe das aktive Element nach vorne bis (n>n-1).
+        - Cocktailshakersort Bubblesort aber sortiere in beide richtungen.
+        - Quicksort          Suche ein pivot Element, sortiere alle elemente, die kleiner als der Pivot sind links vom Pivot und alle größeren rechts. Wiederhole recursiv für die Teillisten.
+        - Bogosort           Vertausche zwei zufällige Elemente der Liste, bis sie Sortiert ist.
+
+    - GUI / Visualisierung
+        - Sortiervorgänge können durch den -v [delay] parameter Visualisiert werden.
+        - Delay ist die wartezeit in millisekunden, nach einem Vergleich oder Sortier vorgang. kleineres Delay == schnellere Simulation
+        - Delay kann im visualisierungs Fenster mit +/- angepasst werden.
+        - Simulation kann mit P pausiert werden.
+        - Die elemente der angegebenen List werden dynamisch in Säulen dargestellt.
+        - Dimensionen des Fensters lassen sich anpassen.
+        - Verbesserte darstellung der Pointer
+        - Verbesserte kompatiblität mit Radixsort
+
+    - Es kann eine Liste an Sortieralgorithmen gewählt werden.
+    - Zeit, Vergleiche und Vertauschungen werden gemessen.
+    - Daten in einer output Datei speichern.
+    - Durchschnitt mehrerer iterationen.
+    - Error Checks.
+    - standard Werte der Parameter.
+    - (-h) Help option!
