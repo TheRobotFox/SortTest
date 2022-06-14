@@ -1,9 +1,3 @@
-Geschwindigkeit:
-1. SortTest_CLang - Clang + lld      (LLVM linker)
-2. SortTest_GCC   - GCC   + ld       (GNU linker)
-3. SortTest_CL    - CL    + link     (Microsoft)
-4. SortTest_CLC   - CL    + Crinkler     nur 5,7 kilobytes!!
-
 SortTest  v5:
     - Liste aus csv auslesen
     - csv kann als parameter übergeben werden 
