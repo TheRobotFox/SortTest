@@ -26,7 +26,7 @@ int fill_random(int n, LIST *List){
     int res=fill_to_n(n,List);
     srand((int)time(0));
     unsigned int tmp,rn1;
-    for(int j=0; j<100; j++)
+    //for(int j=0; j<100; j++)
         for(int i=0; i<n; i++){
             rn1=start + (int)((float)rand()/RAND_MAX*(n-start-1));
             tmp=List->data[i];

@@ -36,8 +36,8 @@ enum INPUT{
 };
 
 
-#define DELAY_MIN 0.000001
-#define DELAY_MAX 2000
+#define DELAY_MIN 0.001
+#define DELAY_MAX 1000
 
 void handleInput(enum INPUT e)
 {
@@ -47,15 +47,13 @@ void handleInput(enum INPUT e)
         INFO->pause=!INFO->pause; break;
     case SPEED_DOWN:
         INFO->delay*=1.3;
-        if(INFO->delay<=DELAY_MIN)
-            INFO->delay=DELAY_MIN;
-        break;
-    case SPEED_UP:
         if(INFO->delay>DELAY_MAX)
              INFO->delay=DELAY_MAX;
+        break;
+    case SPEED_UP:
         INFO->delay/=1.3;
-        if(INFO->delay<DELAY_MIN)
-             INFO->delay=0.0;
+        if(INFO->delay<=DELAY_MIN)
+            INFO->delay=DELAY_MIN;
         break;
     }
 }
@@ -389,8 +387,10 @@ void gui_wait(){
                 // sub 1ms wait with time smearing
                 static float time=0;
                 time+=INFO->delay;
-                Sleep((int)time);
-                time-=(int)time;
+                if((int)time){
+                    Sleep((int)time);
+                    time-=(int)time;
+                }
             }
 
         }
@@ -420,7 +420,7 @@ void gui_update(){
 void gui_updateList(LIST* List){
     if(INFO->active){
         INFO->no_render=1;
-		while(INFO->rendering)
+		while(INFO->rendering && INFO->active)
             Sleep(1);
         INFO->List=List;
 		if(List)

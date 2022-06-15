@@ -130,8 +130,8 @@ int main(int argc, char** argv){
     Conf.iterations=arg_get('i')->val;
     Conf.Sortalg_count=arg_get('a')->length;
     Conf.SortAlgs=arg_get('a')->sorting_algs;
-    int GUI = (arg_get('v')->f_val>=0);
 
+    info.activate=(arg_get('v')->f_val>0);
     int error=0;
 
     if(Conf.iterations<=0){
@@ -186,8 +186,7 @@ int main(int argc, char** argv){
 
 
     // Create GUI Thread
-    if(GUI){
-        info.activate=1;
+    if(info.activate){
         info.delay=arg_get('v')->f_val;
         #ifdef _WIN32
         // info.delay=10000.0/pow(Conf.List.size,1.9);
