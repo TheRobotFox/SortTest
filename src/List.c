@@ -2,7 +2,7 @@
 
 LIST CreateList(int size){
     LIST List;
-    List.data=calloc(size,sizeof(int));
+    List.data=malloc(size*sizeof(int));
     List.size=size;
     List.filled=0;
     return List;

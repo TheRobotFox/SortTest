@@ -42,11 +42,11 @@ void render(){
     //Clear Screen
     FillRect(hdc,&rc,Black);
     #elif defined(__unix__)
-	XGetWindowAttributes(d,w,&attr);
-	rc.right=attr.width;
-	rc.bottom=attr.height;
-	XFillRectangle(d,w,Black,0,0,rc.right,rc.bottom);
-	#elif defined(NSPIRE)	
+    XGetWindowAttributes(d,w,&attr);
+   	rc.right=attr.width;
+   	rc.bottom=attr.height;
+   	XFillRectangle(d,w,Black,0,0,rc.right,rc.bottom);
+    #elif defined(NSPIRE)
     rc.right=320;
     rc.bottom=240;
     clear(screenbuff);
@@ -88,7 +88,7 @@ void render(){
             }
             #elif defined(__unix__)
 			XFillRectangle(d,w,color,line.left,line.top,line.right-line.left,line.bottom-line.top);
-			
+
 			#else
             FillRect(hdc,&line,color);
             #endif
@@ -154,7 +154,7 @@ void *create_gui(void* info){
 		//	if(e.type == KeyPress){
 		//		switch(XkbKeycodeToKeysym(d,e.xkey.keycode,0,0)){
 		//		}
-								
+
 		//	}
 		//if(e.type == Expose)
 		//	render();
@@ -287,7 +287,7 @@ DWORD WINAPI create_gui(LPVOID info){
             INFO->hwnd = CreateWindowExA(WS_EX_OVERLAPPEDWINDOW, Name, Name, WS_VISIBLE | WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL, INFO->hinstance, NULL);
 
             if(INFO->hwnd){
-                
+
                 INFO->active=1;
                 MSG msg;
 
@@ -315,13 +315,13 @@ void gui_wait(){
         // Correct time for delay
         #ifndef NSPIRE
         INFO->Alg->time+=clock()-INFO->Alg->time_start;
+        #endif
         if(INFO->pause){
             //INFO->Alg->time+=clock()-INFO->Alg->time_start;
             while(INFO->pause)
                 Sleep(5);
             //INFO->Alg->time_start=clock();
         }else{
-        #endif
 
             if(INFO->delay){
                 // sub 1ms wait with time smearing
@@ -331,16 +331,14 @@ void gui_wait(){
                 time-=(int)time;
             }
 
-
+        }
         #ifdef NSPIRE
         if(isKeyPressed(KEY_NSPIRE_ESC)){
-            wait_no_key_pressed();
-            nio_free(&console);
-            exit(0);
+            INFO->active=0;
+            return;
         }
         gui_update();
         #else
-        }
         INFO->Alg->time_start=clock();
         #endif
     }

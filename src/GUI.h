@@ -1,13 +1,13 @@
 #pragma once
 
 #ifdef NSPIRE
-#include <os.h>
-#include <nspireio/nspireio.h>
+#include <stdio.h>
+#include <errno.h>
+#include <stdlib.h>
+#include <libndls.h>
+#undef malloc
 #define PIXELS (320*240)
 #define Sleep(ms) msleep(ms)
-nio_console console;
-nio_console* ptr_console;
-#define printf(str,...) nio_fprintf(ptr_console, str, ##__VA_ARGS__)
 #endif
 #if defined(_WIN32)
 #include <windows.h>

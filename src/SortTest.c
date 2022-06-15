@@ -4,7 +4,7 @@
 #include "csv.h"
 #include "GUI.h"
 #include "math.h"
-
+#include "nspire.h"
 typedef struct{
     LIST List;
     SortAlg *SortAlgs;
@@ -13,7 +13,6 @@ typedef struct{
     FILE* output;
     int delay;
 } Settings;
-
 
 void free_Settings(Settings* Conf){
     free_List(&Conf->List);
@@ -68,19 +67,35 @@ LIST Test(LIST* SortList, SortAlg *Alg, int iterations){
 }
 
 
-#define CMDLINELENGTH 512
+#ifdef NSPIRE
+#define OUT_FORMAT "%-20s - %.3fs\n%10llu swaps %10llu compares\n\n"
+#else
+#define OUT_FORMAT "%-20s %fs %19llu swaps %19llu compares\n"
+#endif
 
+
+Settings Conf = {0};
 
 #ifdef NSPIRE
-int main(void){
-    nio_init(&console, NIO_MAX_COLS, NIO_MAX_ROWS, 0, 0, NIO_COLOR_BLACK, NIO_COLOR_WHITE, TRUE);
-    nio_fputs("SortTest.tns ",&console);
-    char cmdLine[CMDLINELENGTH] = "SortTest.tns ";
-    nio_fgets(cmdLine+13,CMDLINELENGTH-13,&console);
-    CSV argv_csv = split(cmdLine,strlen(cmdLine),' ');
-    if(argparse(argv_csv.size,argv_csv.data)){
-        wait_key_pressed();
 
+extern char* CMDBUF[CMDBUFLEN];
+extern short buffer_index, latest;
+
+int main(void){
+    for(int i=0; i<CMDBUFLEN; i++)
+    {
+        CMDBUF[i]=malloc(CMDLINELENGTH);
+        memcpy(CMDBUF[i],NAME,sizeof(NAME));
+    }
+start:
+    while(!getcmd()){
+    CSV argv_csv = split(CMDBUF[buffer_index],strlen(CMDBUF[buffer_index]),' ');
+    buffer_index=latest;
+    if(argparse(argv_csv.size,argv_csv.data)){
+        free_CSV(argv_csv);
+        #ifdef NSPIRE
+        goto start;
+        #endif
         return 1;
     }
     free_CSV(argv_csv);
@@ -90,11 +105,8 @@ int main(int argc, char** argv){
         return 1;
 #endif
 
-    Settings Conf = {0};
 
-    #ifndef NSPIRE
     Conf.output=arg_get('o')->File;
-    #endif
     Conf.iterations=arg_get('i')->val;
     Conf.Sortalg_count=arg_get('a')->length;
     Conf.SortAlgs=arg_get('a')->sorting_algs;
@@ -113,17 +125,12 @@ int main(int argc, char** argv){
 
     if(error){
         #ifdef NSPIRE
-        nio_fprintf(&console,"ERROR\n");
-        wait_key_pressed();
+        goto start;
         #endif
         return -1;
     }
 
-    #ifdef NSPIRE
-    char l_args[]="rc";
-    #else
     char l_args[]="lrc";
-    #endif
     for(unsigned int i=0; i<sizeof(l_args)-1; i++){
         if(arg_get(l_args[i])->val){
             Conf.List=arg_get(l_args[i])->List;
@@ -134,24 +141,25 @@ int main(int argc, char** argv){
     if(error!=1){
         printf("One List must be specified!\n");
         #ifdef NSPIRE
-        wait_key_pressed();
+        goto start;
         #endif
         return -1;
     }
 
     if(Conf.List.size==0){
         printf("List is empty\n");
+        #ifdef NSPIRE
+        goto start;
+        #endif
         return -1;
     }
 
 
     printSettings(&Conf);
-    #ifndef NSPIRE
     if(Conf.output){
         fprintf(Conf.output,"Unsorted List:");
         List_to_File(Conf.output,&Conf.List);
     }
-    #endif
 
     LIST List={0};
 
@@ -169,17 +177,15 @@ int main(int argc, char** argv){
     HANDLE Thread;
     SECURITY_ATTRIBUTES sa = {0};
     Thread = CreateThread(&sa,0,create_gui,&info,0,0);
-	#elif defined(__unix__)
-	pthread_t Thread;
-	pthread_create(&Thread, NULL, create_gui, &info);
+    #elif defined(__unix__)
+    pthread_t Thread;
+    pthread_create(&Thread, NULL, create_gui, &info);
+    #elif defined(NSPIRE)
+    create_gui(&info);
     #endif
-    // Sleep(200);
-    // if(GUI)
-    //     Sleep(1800);
 
     while(!info.active && info.activate)
         Sleep(10);
-
     // Test each Algorithm
     for(int i=0; i<Conf.Sortalg_count; i++){
         // Update GUI Name
@@ -192,14 +198,18 @@ int main(int argc, char** argv){
             List_to_File(Conf.output,&List);
             fprintf(Conf.output,"\nTime: %fs\nSwaps: %llu\nComparisons: %llu\n",Conf.SortAlgs[i].time/CLOCKS_PER_SEC,Conf.SortAlgs[i].swap,Conf.SortAlgs[i].comp);
         }
-
-        printf("%-20s %fs %19llu swaps %19llu compares\n",Conf.SortAlgs[i].name,Conf.SortAlgs[i].time/CLOCKS_PER_SEC,Conf.SortAlgs[i].swap,Conf.SortAlgs[i].comp);
         #endif
+
+        printf(OUT_FORMAT,Conf.SortAlgs[i].name,Conf.SortAlgs[i].time/CLOCKS_PER_SEC,Conf.SortAlgs[i].swap,Conf.SortAlgs[i].comp);
         if(List.size>0)
             free_List(&List);
     }
     #ifdef NSPIRE
-    nio_free(&console);
+    } // LOOP TIL QUIT
+    for(int i=0; i<CMDBUFLEN; i++)
+    {
+        free(CMDBUF[i]);
+    }
 	wait_key_pressed();
     #else
     if(info.active){

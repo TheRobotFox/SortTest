@@ -138,7 +138,7 @@ int getCmd(int arg_list_index ,arg* arg_list, int* arg_index, int argc, char** a
         }
         size+=num;
     }
-    
+
     LIST List = CreateList(size);
     for(int c=0; c<CSV.size; c+=2){
         error=1;
@@ -214,14 +214,10 @@ const int arg_resolver_count = sizeof(arg_resolvers)/sizeof(arg_resolvers[0]);
 
 arg arguments[]={
     {'c',2  ,"Create List via filling commands"},
-    #ifndef NSPIRE
     {'l',0  ,"load CSV from file"},
-    #endif
     {'r',1  ,"read raw csv"},
     {'a',3  ,"List of Sortingalgorithms to test"},
-    #ifndef NSPIRE
     {'o','O',"Output file path"},
-    #endif
     {'i','I',"num of iterations, results get averaged"},
     {'v','F',"Show Visualisation, float = delay"},
 };
@@ -235,12 +231,8 @@ int argparse(int argc, char** argv){
     arg_get('a')->sorting_algs=&Sorting_Algorithms[0];
     arg_get('a')->length=Sorting_Algorithms_count;
     arg_get('i')->val=1;
-    #ifdef NSPIRE
-    arg_get('v')->val=1;
-    #else
     arg_get('v')->val=-1;
     arg_get('o')->val=0;
-    #endif
 
     for(int arg_index=1; arg_index<argc; arg_index++){
         if(argv[arg_index][0]=='-' && argv[arg_index][1]=='h'){
