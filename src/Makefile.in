@@ -91,8 +91,7 @@ build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = $(top_builddir)/bin/SortTest$(EXEEXT)
 @BUILD_WIN32_TRUE@am__append_1 = -U__unix__ -D_WIN32
-@BUILD_NSPIRE_TRUE@am__append_2 = nspire.c
-@BUILD_NSPIRE_TRUE@am__append_3 = .elf
+@BUILD_NSPIRE_TRUE@am__append_2 = .elf
 subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -105,16 +104,13 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(includedir)"
 PROGRAMS = $(bin_PROGRAMS)
-am____top_builddir__bin_SortTest_SOURCES_DIST = argparse.c csv.c \
-	Sort.c List.c SortTest.c GUI.c nspire.c
-@BUILD_NSPIRE_TRUE@am__objects_1 = __top_builddir__bin_SortTest-nspire.$(OBJEXT)
 am___top_builddir__bin_SortTest_OBJECTS =  \
 	__top_builddir__bin_SortTest-argparse.$(OBJEXT) \
 	__top_builddir__bin_SortTest-csv.$(OBJEXT) \
 	__top_builddir__bin_SortTest-Sort.$(OBJEXT) \
 	__top_builddir__bin_SortTest-List.$(OBJEXT) \
 	__top_builddir__bin_SortTest-SortTest.$(OBJEXT) \
-	__top_builddir__bin_SortTest-GUI.$(OBJEXT) $(am__objects_1)
+	__top_builddir__bin_SortTest-GUI.$(OBJEXT)
 __top_builddir__bin_SortTest_OBJECTS =  \
 	$(am___top_builddir__bin_SortTest_OBJECTS)
 __top_builddir__bin_SortTest_DEPENDENCIES =
@@ -155,7 +151,7 @@ am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = $(__top_builddir__bin_SortTest_SOURCES)
-DIST_SOURCES = $(am____top_builddir__bin_SortTest_SOURCES_DIST)
+DIST_SOURCES = $(__top_builddir__bin_SortTest_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -229,7 +225,7 @@ ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
-EXEEXT = @EXEEXT@ $(am__append_3)
+EXEEXT = @EXEEXT@ $(am__append_2)
 GREP = @GREP@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
@@ -307,9 +303,8 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-__top_builddir__bin_SortTest_SOURCES = argparse.c csv.c Sort.c List.c \
-	SortTest.c GUI.c $(am__append_2)
-include_HEADERS = argparse.h List.h GUI.h csv.h Sort.h nspire.h
+__top_builddir__bin_SortTest_SOURCES = argparse.c csv.c Sort.c List.c SortTest.c GUI.c
+include_HEADERS = argparse.h List.h GUI.h csv.h Sort.h
 @BUILD_NSPIRE_FALSE@__top_builddir__bin_SortTest_CFLAGS = -O3 -mavx2 \
 @BUILD_NSPIRE_FALSE@	-m64 -s $(am__append_1)
 @BUILD_NSPIRE_TRUE@__top_builddir__bin_SortTest_CFLAGS = -Os \
@@ -415,7 +410,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/__top_builddir__bin_SortTest-SortTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/__top_builddir__bin_SortTest-argparse.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/__top_builddir__bin_SortTest-csv.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/__top_builddir__bin_SortTest-nspire.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -514,20 +508,6 @@ __top_builddir__bin_SortTest-GUI.obj: GUI.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GUI.c' object='__top_builddir__bin_SortTest-GUI.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_SortTest_CFLAGS) $(CFLAGS) -c -o __top_builddir__bin_SortTest-GUI.obj `if test -f 'GUI.c'; then $(CYGPATH_W) 'GUI.c'; else $(CYGPATH_W) '$(srcdir)/GUI.c'; fi`
-
-__top_builddir__bin_SortTest-nspire.o: nspire.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_SortTest_CFLAGS) $(CFLAGS) -MT __top_builddir__bin_SortTest-nspire.o -MD -MP -MF $(DEPDIR)/__top_builddir__bin_SortTest-nspire.Tpo -c -o __top_builddir__bin_SortTest-nspire.o `test -f 'nspire.c' || echo '$(srcdir)/'`nspire.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/__top_builddir__bin_SortTest-nspire.Tpo $(DEPDIR)/__top_builddir__bin_SortTest-nspire.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nspire.c' object='__top_builddir__bin_SortTest-nspire.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_SortTest_CFLAGS) $(CFLAGS) -c -o __top_builddir__bin_SortTest-nspire.o `test -f 'nspire.c' || echo '$(srcdir)/'`nspire.c
-
-__top_builddir__bin_SortTest-nspire.obj: nspire.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_SortTest_CFLAGS) $(CFLAGS) -MT __top_builddir__bin_SortTest-nspire.obj -MD -MP -MF $(DEPDIR)/__top_builddir__bin_SortTest-nspire.Tpo -c -o __top_builddir__bin_SortTest-nspire.obj `if test -f 'nspire.c'; then $(CYGPATH_W) 'nspire.c'; else $(CYGPATH_W) '$(srcdir)/nspire.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/__top_builddir__bin_SortTest-nspire.Tpo $(DEPDIR)/__top_builddir__bin_SortTest-nspire.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nspire.c' object='__top_builddir__bin_SortTest-nspire.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_SortTest_CFLAGS) $(CFLAGS) -c -o __top_builddir__bin_SortTest-nspire.obj `if test -f 'nspire.c'; then $(CYGPATH_W) 'nspire.c'; else $(CYGPATH_W) '$(srcdir)/nspire.c'; fi`
 install-includeHEADERS: $(include_HEADERS)
 	@$(NORMAL_INSTALL)
 	@list='$(include_HEADERS)'; test -n "$(includedir)" || list=; \

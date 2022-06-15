@@ -28,6 +28,38 @@ GC Green, Red, White, Black, color;
 XWindowAttributes attr;
 #endif
 	
+
+enum INPUT{
+    TOGGLE_PAUSE,
+    SPEED_UP,
+    SPEED_DOWN
+};
+
+
+#define DELAY_MIN 0.000001
+#define DELAY_MAX 2000
+
+void handleInput(enum INPUT e)
+{
+    switch(e)
+    {
+    case TOGGLE_PAUSE:
+        INFO->pause=!INFO->pause; break;
+    case SPEED_DOWN:
+        INFO->delay*=1.3;
+        if(INFO->delay<=DELAY_MIN)
+            INFO->delay=DELAY_MIN;
+        break;
+    case SPEED_UP:
+        if(INFO->delay>DELAY_MAX)
+             INFO->delay=DELAY_MAX;
+        INFO->delay/=1.3;
+        if(INFO->delay<DELAY_MIN)
+             INFO->delay=0.0;
+        break;
+    }
+}
+
 void render(){
     if(INFO->no_render)
         return;
@@ -131,7 +163,7 @@ void *create_gui(void* info){
 		return NULL;
 	#ifdef NSPIRE
     lcd_init(SCR_320x240_16);
-	#elif defined(__unix__) 
+	#elif defined(__unix__)
 	d=XOpenDisplay(NULL);
 	s=DefaultScreen(d);
 	w=XCreateSimpleWindow(d, RootWindow(d,s), 10,10,100,100,1, BlackPixel(d,s), BlackPixel(d,s));
@@ -174,7 +206,7 @@ LRESULT CALLBACK SortGUI(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
     switch(msg)
     {
         case WM_CREATE:
-        {   
+        {
             //Init Objects
             wndhdc= GetDC(hwnd);
             hdc = CreateCompatibleDC(wndhdc);
@@ -237,28 +269,21 @@ LRESULT CALLBACK SortGUI(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
         }
         case WM_KEYDOWN:
         {
-            // Pause
-            if(wParam=='P')
-                INFO->pause=!INFO->pause;
+            enum INPUT event;
+            switch(wParam)
+            {
+            case 'P':
+                event=TOGGLE_PAUSE; break;
 
-            // Change Delay
-
-            #define DELAY_MIN 0.0000001
-            #define DELAY_MAX 1000
-
-            if(wParam==VK_ADD || wParam==VK_OEM_PLUS){
-                INFO->delay*=1.3;
-                if(INFO->delay<=DELAY_MIN)
-                    INFO->delay=DELAY_MIN;
-                if(INFO->delay<0.0 || INFO->delay>DELAY_MAX )
-                    INFO->delay=DELAY_MAX;
+            case VK_OEM_MINUS:
+            case VK_SUBTRACT:
+                event=SPEED_UP; break;
+            case VK_OEM_PLUS:
+            case VK_ADD:
+                event=SPEED_DOWN; break;
             }
-            if(wParam==VK_SUBTRACT ||wParam==VK_OEM_MINUS)
-                INFO->delay/=1.3;
-            if(INFO->delay<DELAY_MIN)
-                 INFO->delay=0.0;
+            handleInput(event);
 
-            
         break;
         }
         default:
@@ -309,16 +334,53 @@ DWORD WINAPI create_gui(LPVOID info){
 }
 #endif
 
+#ifdef NSPIRE
+
+void getKey(){
+    static int pressed=0;
+
+		if(isKeyPressed(KEY_NSPIRE_ESC)){
+        INFO->active=0;
+        wait_no_key_pressed();
+    }
+
+    if(isKeyPressed(KEY_NSPIRE_P)){
+        handleInput(TOGGLE_PAUSE);
+        wait_no_key_pressed();
+    }
+
+    if(!any_key_pressed())
+        pressed=0;
+    if(pressed)
+        return;
+		if(isKeyPressed(KEY_NSPIRE_PLUS)){
+				pressed=1;
+        handleInput(SPEED_DOWN);
+    }
+		if(isKeyPressed(KEY_NSPIRE_MINUS)){
+				pressed=1;
+        handleInput(SPEED_UP);
+    }
+
+}
+
+#endif
 
 void gui_wait(){
     if(INFO->active){
         // Correct time for delay
-        #ifndef NSPIRE
+        #ifdef NSPIRE
+        getKey();
+        #else
         INFO->Alg->time+=clock()-INFO->Alg->time_start;
         #endif
         if(INFO->pause){
             //INFO->Alg->time+=clock()-INFO->Alg->time_start;
+            #ifdef NSPIRE
+            while(!isKeyPressed(KEY_NSPIRE_P) && !isKeyPressed(KEY_NSPIRE_ESC))
+            #else
             while(INFO->pause)
+            #endif
                 Sleep(5);
             //INFO->Alg->time_start=clock();
         }else{
@@ -333,10 +395,6 @@ void gui_wait(){
 
         }
         #ifdef NSPIRE
-        if(isKeyPressed(KEY_NSPIRE_ESC)){
-            INFO->active=0;
-            return;
-        }
         gui_update();
         #else
         INFO->Alg->time_start=clock();

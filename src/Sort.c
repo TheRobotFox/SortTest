@@ -16,10 +16,10 @@ int getSwap(){
 }
 
 void Swap(unsigned int a, unsigned int b, LIST *List){
-	if(a<0 || a>=List->size || b<0 || b<List->size){
+	//if(a<0 || a>=List->size || b<0 || b<List->size){
 		//printf("OOB Swap!");
 		//raise(SIGINT);
-	}	
+	//}	
     int tmp;
     tmp=List->data[a];
     List->data[a]=List->data[b];
@@ -98,7 +98,11 @@ void StalinSort(LIST *List){
     }
 }
 
+#ifdef NSPIRE
+#define RADIX 4
+#else
 #define RADIX 256 // FASTEST 256
+#endif
 #define RADIX_ITER (int)(sizeof(int)*8.0/log2(RADIX))
 
 #ifdef TCC

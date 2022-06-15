@@ -25,14 +25,13 @@ int fill_random(int n, LIST *List){
     int start=List->filled;
     int res=fill_to_n(n,List);
     srand((int)time(0));
-    unsigned int tmp,rn1,rn2;
+    unsigned int tmp,rn1;
     for(int j=0; j<100; j++)
         for(int i=0; i<n; i++){
             rn1=start + (int)((float)rand()/RAND_MAX*(n-start-1));
-            rn2=start + (int)((float)rand()/RAND_MAX*(n-start-1));
-            tmp=List->data[rn1];
-            List->data[rn1]=List->data[rn2];
-            List->data[rn2]=tmp;
+            tmp=List->data[i];
+            List->data[i]=List->data[rn1];
+            List->data[rn1]=tmp;
         }
     return res;
 }

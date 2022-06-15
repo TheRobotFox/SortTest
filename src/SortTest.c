@@ -4,7 +4,7 @@
 #include "csv.h"
 #include "GUI.h"
 #include "math.h"
-#include "nspire.h"
+
 typedef struct{
     LIST List;
     SortAlg *SortAlgs;
@@ -48,7 +48,9 @@ LIST Test(LIST* SortList, SortAlg *Alg, int iterations){
         Alg->time_start = clock();
         #endif
         Alg->func(&List);
-        #ifndef NSPIRE
+        #ifdef NSPIRE
+        gui_update();
+        #else
         Alg->time+=clock()-Alg->time_start;
         #endif
     	for(int i=0; info.active && i<50; i++){
@@ -74,29 +76,46 @@ LIST Test(LIST* SortList, SortAlg *Alg, int iterations){
 #endif
 
 
-Settings Conf = {0};
 
 #ifdef NSPIRE
 
-extern char* CMDBUF[CMDBUFLEN];
-extern short buffer_index, latest;
+#define CMDLINELENGTH 512
+#define NAME "SortTest.tns"
+char CMDBUF[CMDLINELENGTH]= NAME;
+
+int getcmd(){
+    size_t i=sizeof(NAME)-1;
+    char c;
+    CMDBUF[i]=' ';
+    i++;
+    CMDBUF[i]=0;
+    printf("%s",CMDBUF);
+    fflush(stdout);
+    fflush(stdin);
+    while(i<CMDLINELENGTH)
+    {
+        c=getchar();
+        if(c=='\n'){
+            if(isKeyPressed(KEY_NSPIRE_ESC))
+                return 1;
+            getchar(); //catch second newline; why ???
+            break;
+        }
+        CMDBUF[i]=c;
+        i++;
+    }
+    CMDBUF[i]=0;
+    return 0;
+}
 
 int main(void){
-    for(int i=0; i<CMDBUFLEN; i++)
-    {
-        CMDBUF[i]=malloc(CMDLINELENGTH);
-        memcpy(CMDBUF[i],NAME,sizeof(NAME));
-    }
-start:
     while(!getcmd()){
-    CSV argv_csv = split(CMDBUF[buffer_index],strlen(CMDBUF[buffer_index]),' ');
-    buffer_index=latest;
+    wait_no_key_pressed();
+    CSV argv_csv = split(CMDBUF,strlen(CMDBUF),' ');
+
     if(argparse(argv_csv.size,argv_csv.data)){
         free_CSV(argv_csv);
-        #ifdef NSPIRE
-        goto start;
-        #endif
-        return 1;
+        continue;
     }
     free_CSV(argv_csv);
 #else
@@ -105,12 +124,13 @@ int main(int argc, char** argv){
         return 1;
 #endif
 
+    Settings Conf = {0};
 
     Conf.output=arg_get('o')->File;
     Conf.iterations=arg_get('i')->val;
     Conf.Sortalg_count=arg_get('a')->length;
     Conf.SortAlgs=arg_get('a')->sorting_algs;
-    int GUI = (arg_get('v')->val!=-1);
+    int GUI = (arg_get('v')->f_val>=0);
 
     int error=0;
 
@@ -125,9 +145,10 @@ int main(int argc, char** argv){
 
     if(error){
         #ifdef NSPIRE
-        goto start;
+        continue;
+        #else
+        return 1;
         #endif
-        return -1;
     }
 
     char l_args[]="lrc";
@@ -140,18 +161,18 @@ int main(int argc, char** argv){
 
     if(error!=1){
         printf("One List must be specified!\n");
-        #ifdef NSPIRE
-        goto start;
-        #endif
-        return -1;
+        if(error==0)
+            #ifdef NSPIRE
+            continue;
+            #else
+            return 1;
+            #endif
+				goto end;
     }
 
     if(Conf.List.size==0){
         printf("List is empty\n");
-        #ifdef NSPIRE
-        goto start;
-        #endif
-        return -1;
+				goto end;
     }
 
 
@@ -192,25 +213,21 @@ int main(int argc, char** argv){
         if(info.active)
             info.Alg=Conf.SortAlgs+i;
         List = Test(&Conf.List,&Conf.SortAlgs[i],Conf.iterations);
-        #ifndef NSPIRE
         if(Conf.output){
             fprintf(Conf.output,"\n\n%s:",Conf.SortAlgs[i].name);
             List_to_File(Conf.output,&List);
-            fprintf(Conf.output,"\nTime: %fs\nSwaps: %llu\nComparisons: %llu\n",Conf.SortAlgs[i].time/CLOCKS_PER_SEC,Conf.SortAlgs[i].swap,Conf.SortAlgs[i].comp);
+            fprintf(Conf.output,OUT_FORMAT,Conf.SortAlgs[i].time/CLOCKS_PER_SEC,Conf.SortAlgs[i].swap,Conf.SortAlgs[i].comp);
         }
-        #endif
 
         printf(OUT_FORMAT,Conf.SortAlgs[i].name,Conf.SortAlgs[i].time/CLOCKS_PER_SEC,Conf.SortAlgs[i].swap,Conf.SortAlgs[i].comp);
         if(List.size>0)
             free_List(&List);
     }
+end:
     #ifdef NSPIRE
+    free_Settings(&Conf);
     } // LOOP TIL QUIT
-    for(int i=0; i<CMDBUFLEN; i++)
-    {
-        free(CMDBUF[i]);
-    }
-	wait_key_pressed();
+
     #else
     if(info.active){
 		info.active=0;
@@ -220,8 +237,8 @@ int main(int argc, char** argv){
 		pthread_join(Thread, NULL);
 		#endif
 	}
-    #endif
     free_Settings(&Conf);
+    #endif
 
     return 0;
 }

@@ -2,10 +2,11 @@ AC_INIT([SortTest],[6.0], [pfoch.tomke@gmail.com])
 AC_CANONICAL_HOST
 
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
-AC_PROG_CC
+
 
 build_linux=no
 build_windows=no
+build_nspire=no
 
 
 # Detect the target system
@@ -18,11 +19,14 @@ case "${host_os}" in
         ;;
     nspire)
     	build_nspire=yes
+        CC="nspire-gcc"       
         ;;
     *)
         AC_MSG_ERROR(["OS $host_os is not supported"])
         ;;
 esac
+
+AC_PROG_CC
 
 # Pass the conditionals to automake
 AM_CONDITIONAL([BUILD_LINUX], [test "$build_linux" = "yes"])

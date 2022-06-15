@@ -6,7 +6,11 @@ typedef struct{
     int (*resolve)(int ,arg*, int*, int, char**);
 } arg_resolver;
 
-
+#ifdef NSPIRE
+#define SEP "-"
+#else
+#define SEP "_"
+#endif
 // Sortingalgorithms
 
 SortAlg Sorting_Algorithms[]= {
@@ -14,7 +18,7 @@ SortAlg Sorting_Algorithms[]= {
     {"BubbleSort",BubbleSort},
     {"SelectionSort",SelectionSort},
     {"StalinSort",StalinSort},
-    {"LSD_RadixSort",LSD_Radix},
+    {"LSD"SEP"RadixSort",LSD_Radix},
     {"InsertionSort",InsertionSort},
     {"CocktailshakerSort",CocktailshakerSort},
     {"QuickSort",QuickSort_launcher},
@@ -29,8 +33,8 @@ const int Sorting_Algorithms_count = sizeof(Sorting_Algorithms)/sizeof(SortAlg);
 
 const FillCmd Fill_Commands[]={
     {"fill",fill_to_n, "Normal fill 0-n"},
-    {"fill_reversed",fill_reversed,"Reverse order fill 0-n"},
-    {"fill_random",fill_random, "Fill 0-n and randomize"},
+    {"fill"SEP"reversed",fill_reversed,"Reverse order fill 0-n"},
+    {"fill"SEP"random",fill_random, "Fill 0-n and randomize"},
     {"random",random_fill,"Fill with n random numbers 0-(n*10)"}
 };
 
@@ -231,7 +235,7 @@ int argparse(int argc, char** argv){
     arg_get('a')->sorting_algs=&Sorting_Algorithms[0];
     arg_get('a')->length=Sorting_Algorithms_count;
     arg_get('i')->val=1;
-    arg_get('v')->val=-1;
+    arg_get('v')->f_val=-1.0;
     arg_get('o')->val=0;
 
     for(int arg_index=1; arg_index<argc; arg_index++){

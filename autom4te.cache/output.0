@@ -2863,6 +2863,30 @@ END
   fi
 fi
 
+
+
+build_linux=no
+build_windows=no
+build_nspire=no
+
+
+# Detect the target system
+case "${host_os}" in
+    linux*)
+        build_linux=yes
+        ;;
+    cygwin*|mingw*|msys*)
+        build_windows=yes
+        ;;
+    nspire)
+    	build_nspire=yes
+        CC="nspire-gcc"       
+        ;;
+    *)
+        as_fn_error $? "\"OS $host_os is not supported\"" "$LINENO" 5
+        ;;
+esac
+
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -3902,26 +3926,6 @@ else
 fi
 
 
-
-build_linux=no
-build_windows=no
-
-
-# Detect the target system
-case "${host_os}" in
-    linux*)
-        build_linux=yes
-        ;;
-    cygwin*|mingw*|msys*)
-        build_windows=yes
-        ;;
-    nspire)
-    	build_nspire=yes
-        ;;
-    *)
-        as_fn_error $? "\"OS $host_os is not supported\"" "$LINENO" 5
-        ;;
-esac
 
 # Pass the conditionals to automake
  if test "$build_linux" = "yes"; then
