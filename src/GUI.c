@@ -376,10 +376,11 @@ void gui_wait(){
             //INFO->Alg->time+=clock()-INFO->Alg->time_start;
             #ifdef NSPIRE
             while(!isKeyPressed(KEY_NSPIRE_P) && !isKeyPressed(KEY_NSPIRE_ESC))
+                ;
             #else
             while(INFO->pause)
-            #endif
                 Sleep(5);
+            #endif
             //INFO->Alg->time_start=clock();
         }else{
 

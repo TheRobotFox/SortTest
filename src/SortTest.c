@@ -5,6 +5,8 @@
 #include "GUI.h"
 #include "math.h"
 
+#define DBGP// printf("DBG AT:%d\n", __LINE__); getchar(); getchar()
+
 typedef struct{
     LIST List;
     SortAlg *SortAlgs;
@@ -37,25 +39,33 @@ LIST Test(LIST* SortList, SortAlg *Alg, int iterations){
 		List.size=SortList->size;
         for(int i=0; i<List.size; i++)
             List.data[i]=SortList->data[i];
+    DBGP;
         reset();
         gui_updateList(&List);
         gui_pointer1(-1);
         gui_pointer2(-1);
+    DBGP;
+        #ifdef NSPIRE
+        if(info.active)
+        Sleep(1000);
+        #else
     	for(int i=0; info.active && i<50; i++){
     	    Sleep(20);
     	}
-        #ifndef NSPIRE
         Alg->time_start = clock();
         #endif
         Alg->func(&List);
+    DBGP;
         #ifdef NSPIRE
         gui_update();
+        if(info.active)
+        Sleep(1000);
         #else
         Alg->time+=clock()-Alg->time_start;
-        #endif
     	for(int i=0; info.active && i<50; i++){
     	    Sleep(20);
     	}
+        #endif
     }
     Alg->time/=iterations;
     Alg->comp=getComp();
@@ -78,6 +88,41 @@ LIST Test(LIST* SortList, SortAlg *Alg, int iterations){
 
 
 #ifdef NSPIRE
+
+void Sleep(size_t millisec)
+{
+                // see http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0271d/CHDFDDCF.html
+                volatile unsigned *load = (unsigned*)0x900D0000;
+                volatile unsigned *control = (unsigned*)0x900D0008;
+                volatile unsigned *int_clear = (unsigned*)0x900D000C;
+                volatile unsigned *int_status = (unsigned*)0x900D0010;
+                unsigned orig_control = *control;
+                unsigned orig_load = *load;
+                *control = 0; // disable timer
+                *int_clear = 1; // clear interrupt status
+                *load = 32 * millisec;
+                *control = 0b01100011; // disabled, TimerMode N/A, int, no prescale, 32-bit, One Shot -> 32khz
+                *control = 0b11100011; // enable timer
+
+                // Can't use idle() here as it acks the timer interrupt
+                volatile unsigned *intmask = IO(0xDC000008, 0xDC000010);
+                unsigned orig_mask = intmask[0];
+                intmask[1] = ~(1 << 19); // Disable all IRQs except timer
+
+                while ((*int_status & 1) == 0 && !isKeyPressed(KEY_NSPIRE_ESC))
+                        __asm volatile("mcr p15, 0, %0, c7, c0, 4" : : "r"(0) ); // Wait for an interrupt to occur
+
+                intmask[1] = 0xFFFFFFFF; // Disable all IRQs
+                intmask[0] = orig_mask; // renable IRQs
+
+                *control = 0; // disable timer
+                *int_clear = 1; // clear interrupt status
+                *control = orig_control & 0b01111111; // timer still disabled
+                *load = orig_load;
+                *control = orig_control; // enable timer
+                if(isKeyPressed(KEY_NSPIRE_ESC))
+                    info.active=0;
+}
 
 #define CMDLINELENGTH 512
 #define NAME "SortTest.tns"
@@ -130,7 +175,6 @@ int main(int argc, char** argv){
     Conf.iterations=arg_get('i')->val;
     Conf.Sortalg_count=arg_get('a')->length;
     Conf.SortAlgs=arg_get('a')->sorting_algs;
-
     info.activate=(arg_get('v')->f_val>0);
     int error=0;
 
@@ -177,11 +221,13 @@ int main(int argc, char** argv){
 
 
     printSettings(&Conf);
+    DBGP;
     if(Conf.output){
         fprintf(Conf.output,"Unsorted List:");
         List_to_File(Conf.output,&Conf.List);
     }
 
+    DBGP;
     LIST List={0};
 
 
@@ -193,6 +239,7 @@ int main(int argc, char** argv){
         info.hinstance=GetModuleHandle(0);
         #endif
     }
+    DBGP;
     #ifdef _WIN32
     HANDLE Thread;
     SECURITY_ATTRIBUTES sa = {0};
@@ -203,15 +250,18 @@ int main(int argc, char** argv){
     #elif defined(NSPIRE)
     create_gui(&info);
     #endif
-
+    DBGP;
     while(!info.active && info.activate)
         Sleep(10);
     // Test each Algorithm
+    DBGP;
     for(int i=0; i<Conf.Sortalg_count; i++){
         // Update GUI Name
         if(info.active)
             info.Alg=Conf.SortAlgs+i;
+    DBGP;
         List = Test(&Conf.List,&Conf.SortAlgs[i],Conf.iterations);
+    DBGP;
         if(Conf.output){
             fprintf(Conf.output,"\n\n%s:",Conf.SortAlgs[i].name);
             List_to_File(Conf.output,&List);

@@ -7,7 +7,8 @@
 #include <libndls.h>
 #undef malloc
 #define PIXELS (320*240)
-#define Sleep(ms) msleep(ms)
+//#define Sleep(ms) msleep(ms)
+void Sleep(size_t ms);
 #endif
 #if defined(_WIN32)
 #include <windows.h>

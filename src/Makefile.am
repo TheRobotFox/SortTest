@@ -33,7 +33,6 @@ EXE=$(top_builddir)/bin/SortTest
 .elf.zehn:
 		$(GENZEHN) --input $< --output $@ $(ZEHNFLAGS)
 		rm $<
-
 .zehn.tns: 
 		make-prg $< $@
 		rm $<

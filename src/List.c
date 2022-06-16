@@ -10,6 +10,7 @@ LIST CreateList(int size){
 
 void free_List(LIST* List){
     free(List->data);
+    List->size=0;
 }
 
 void printList(int line_length, LIST *List){

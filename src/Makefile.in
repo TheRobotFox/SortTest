@@ -745,7 +745,6 @@ uninstall-am: uninstall-binPROGRAMS uninstall-includeHEADERS
 @BUILD_NSPIRE_TRUE@.elf.zehn:
 @BUILD_NSPIRE_TRUE@		$(GENZEHN) --input $< --output $@ $(ZEHNFLAGS)
 @BUILD_NSPIRE_TRUE@		rm $<
-
 @BUILD_NSPIRE_TRUE@.zehn.tns: 
 @BUILD_NSPIRE_TRUE@		make-prg $< $@
 @BUILD_NSPIRE_TRUE@		rm $<

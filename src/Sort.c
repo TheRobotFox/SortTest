@@ -1,17 +1,17 @@
 #include "Sort.h"
 #include <signal.h>
-unsigned long long comp;
-unsigned long long swap;
+static size_t comp;
+static size_t swap;
 
 void reset(){
     comp=0;
     swap=0;
 }
 
-int getComp(){
+size_t getComp(){
     return comp;
 }
-int getSwap(){
+size_t getSwap(){
     return swap;
 }
 
@@ -19,7 +19,7 @@ void Swap(unsigned int a, unsigned int b, LIST *List){
 	//if(a<0 || a>=List->size || b<0 || b<List->size){
 		//printf("OOB Swap!");
 		//raise(SIGINT);
-	//}	
+	//}
     int tmp;
     tmp=List->data[a];
     List->data[a]=List->data[b];

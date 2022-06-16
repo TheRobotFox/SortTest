@@ -9,14 +9,14 @@ typedef struct {
     void (*func)(LIST*);
     double time_start;
     double time;
-    unsigned long long comp;
-    unsigned long long swap;
+    size_t comp;
+    size_t swap;
 } SortAlg;
 
 #include "GUI.h"
 
-int getComp();
-int getSwap();
+size_t getComp();
+size_t getSwap();
 void reset();
 
 int Verify(LIST* List);
