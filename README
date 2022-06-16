@@ -1,4 +1,10 @@
-Compatable with linux, windows and nspire of course
+Compatable with linux, windows and nspire of course!
+
+Linux requires X11 for visualisation!
+
+Windows requires msys2 / mingw / cygwin (for autotools and maybe gcc)
+
+nspire requires nspire-gcc from nspire-sdk: https://github.com/ndless-nspire/Ndless
 
 SortTest  v5:
     - Liste aus csv auslesen
