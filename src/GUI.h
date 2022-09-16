@@ -43,6 +43,8 @@ typedef struct {
     int max;
     int comp1;
     int comp2;
+    LIST *r_pointers;
+    LIST *g_pointers;
     int skip;
     int mergedistance;
     char active;
@@ -63,6 +65,9 @@ void gui_updateList(LIST* List);
 void gui_pointer1(int p);
 
 void gui_pointer2(int p);
+
+void gui_p_r_clear();
+void gui_p_g_clear();
 
 void gui_update();
 

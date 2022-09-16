@@ -39,3 +39,7 @@ void free_List(LIST* List);
 unsigned int get_max(LIST* List);
 
 int to_num(char* str, int* num);
+
+void List_append(LIST *List, unsigned int e);
+
+void List_concat(LIST *a, LIST *b);

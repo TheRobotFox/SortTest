@@ -38,3 +38,5 @@ void CocktailshakerSort(LIST *List);
 void BogoSort(LIST *List);
 
 void QuickSort_launcher(LIST *List);
+
+void ReculinSort(LIST *List);

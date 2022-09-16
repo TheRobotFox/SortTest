@@ -27,7 +27,6 @@ int s;
 GC Green, Red, White, Black, color;
 XWindowAttributes attr;
 #endif
-	
 
 enum INPUT{
     TOGGLE_PAUSE,
@@ -104,13 +103,22 @@ void render(){
                 continue;
             }
 
+            color=White;
             // Create Rect and color pointers
-            if(index==INFO->comp1)
-                color=Green;
-            else if(index==INFO->comp2)
-                color=Red;
-            else
-                color=White;
+            for(int i=0; i<INFO->r_pointers->filled; i++)
+            {
+                if(INFO->g_pointers->data[i]==index){
+                    color=Red;
+                    break;
+                }
+            }
+            for(int i=0; i<INFO->g_pointers->filled; i++)
+            {
+                if(INFO->g_pointers->data[i]==index){
+                    color=Green;
+                    break;
+                }
+            }
 
         	#ifdef NSPIRE
             for(int i=line.top; i<rc.bottom; i++){
@@ -418,6 +426,7 @@ void gui_update(){
     }
 }
 
+#undef realloc
 void gui_updateList(LIST* List){
     if(INFO->active){
         INFO->no_render=1;
@@ -426,16 +435,45 @@ void gui_updateList(LIST* List){
         INFO->List=List;
 		if(List)
         	INFO->max=get_max(List);
+        if(!INFO->r_pointers){
+            INFO->r_pointers = malloc(sizeof(LIST));
+            *INFO->r_pointers = CreateList(List->size);
+            INFO->g_pointers = malloc(sizeof(LIST));
+            *INFO->g_pointers = CreateList(List->size);
+        }
+        INFO->r_pointers->data = realloc(INFO->r_pointers->data, List->size*sizeof(int));
+        INFO->g_pointers->data = realloc(INFO->g_pointers->data, List->size*sizeof(int));
+        INFO->r_pointers->size= List->size;
+        INFO->g_pointers->size= List->size;
+
         INFO->no_render=0;
     }
 }
 
+void gui_p_g_clear(){
+     if(INFO->active){
+        if(INFO->g_pointers)
+            if(INFO->g_pointers->size>INFO->g_pointers->filled)
+                INFO->g_pointers->filled=0;
+     }
+}
+void gui_p_r_clear(){
+     if(INFO->active){
+        if(INFO->r_pointers)
+            if(INFO->g_pointers->size>INFO->g_pointers->filled)
+                INFO->r_pointers->filled=0;
+     }
+}
 void gui_pointer2(int p){
-     if(INFO->active)
-         INFO->comp2=p;
+     if(INFO->active){
+        if(INFO->r_pointers)
+            INFO->r_pointers->data[INFO->r_pointers->filled++]=p;
+     }
 }
 
 void gui_pointer1(int p){
-     if(INFO->active)
-         INFO->comp1=p;
+     if(INFO->active){
+        if(INFO->g_pointers)
+            INFO->g_pointers->data[INFO->g_pointers->filled++]=p;
+     }
 }

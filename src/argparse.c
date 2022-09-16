@@ -22,7 +22,8 @@ SortAlg Sorting_Algorithms[]= {
     {"InsertionSort",InsertionSort},
     {"CocktailshakerSort",CocktailshakerSort},
     {"QuickSort",QuickSort_launcher},
-    // {"BogoSort",BogoSort}
+    {"ReculinSort", ReculinSort},
+    {"BogoSort",BogoSort}
 
 
 

@@ -5,7 +5,7 @@
 #include "GUI.h"
 #include "math.h"
 
-#define DBGP// printf("DBG AT:%d\n", __LINE__); getchar(); getchar()
+#define DBGP //printf("DBG AT:%d\n", __LINE__); getchar(); getchar()
 
 typedef struct{
     LIST List;

@@ -31,6 +31,8 @@ int Compare(unsigned int a, unsigned int b, LIST *List){
     comp++;
     gui_wait();
     if(List){
+        gui_p_g_clear();
+        gui_p_r_clear();
         gui_pointer1(a);
         gui_pointer2(b);
         return List->data[a]>List->data[b];
@@ -161,9 +163,11 @@ void InsertionSort(LIST *List){
     unsigned int tmp;
     for(int i=1; i<List->size;i++){
         tmp=List->data[i];
+        gui_p_g_clear();
         gui_pointer1(i);
         j=i-1;
         while(j >=0 && Compare(List->data[j],tmp,0)){
+            gui_p_r_clear();
             gui_pointer2(j);
             List->data[j+1]=List->data[j];
             j--;
@@ -223,4 +227,43 @@ void QuickSort(int left, int right, LIST* List){
 
 void QuickSort_launcher(LIST *List){
     QuickSort(0,List->size-1,List);
+}
+
+
+void ReculinSort(LIST *List)
+{
+    LIST urlaub = CreateList(List->size),
+         output = CreateList(List->size);
+    gui_p_g_clear();
+    gui_p_r_clear();
+
+    int largest = 0;
+    List_append(&output, List->data[0]);
+    for(int i=1; i<List->size; i++)
+    {
+        gui_wait();
+        if(List->data[i]>List->data[largest]){
+            List_append(&output, List->data[i]);
+            largest=i;
+            gui_pointer1(i);
+        }else{
+            List_append(&urlaub, List->data[i]);
+            gui_pointer2(i);
+        }
+    }
+
+    //printf("%d | %d\n", urlaub.filled, output.filled);
+    if(urlaub.filled){
+        List_concat(&urlaub, &output);
+        free_List(&output);
+        void* tmp = List->data;
+        List->data=urlaub.data;
+        free(tmp);
+        ReculinSort(List);
+        return;
+    }
+        free_List(&urlaub);
+        void* tmp = List->data;
+        List->data=output.data;
+        free(tmp);
 }

@@ -120,10 +120,28 @@ unsigned int get_max(LIST* List){
     for(int i=0; i<List->size; i++){
         if(List->data[i]>max)
             max=List->data[i];
-    } 
+    }
     return max;
 }
 
 int to_num(char* str, int* num){
     return (sscanf(str,"%d",num)!=1);
+}
+
+
+void List_append(LIST *List, unsigned int e)
+{
+    List->data[List->filled++]=e;
+}
+
+void List_concat(LIST *a, LIST *b)
+{
+    unsigned int *tmp = a->data;
+    a->data = malloc((a->filled+b->filled)*sizeof(unsigned int));
+    for(size_t i=0; i<a->filled; i++)
+        a->data[i]=tmp[i];
+    free(tmp);
+    for(size_t i=0; i<b->filled; i++)
+        a->data[a->filled+i]=b->data[i];
+    a->filled+=b->filled;
 }
