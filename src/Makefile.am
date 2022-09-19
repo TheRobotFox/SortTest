@@ -4,10 +4,10 @@ include_HEADERS = argparse.h List.h GUI.h csv.h Sort.h List/List.h
 
 if BUILD_NSPIRE
 
-__top_builddir__bin_SortTest_CFLAGS=-Os
+__top_builddir__bin_SortTest_CFLAGS=-Ofast -funsafe-math-optimizations
 else
-__top_builddir__bin_SortTest_CFLAGS_fast=-Ofast -mavx2 -Wall -m64 -s -funsafe-math-optimizations
-__top_builddir__bin_SortTest_CFLAGS=-g -fsanitize=address
+__top_builddir__bin_SortTest_CFLAGS=-Ofast -mavx2 -Wall -m64 -s -funsafe-math-optimizations
+__top_builddir__bin_SortTest_CFLAGS_debug=-g -fsanitize=address
 endif
 
 if BUILD_LINUX

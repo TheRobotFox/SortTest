@@ -304,11 +304,14 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 __top_builddir__bin_SortTest_SOURCES = argparse.c csv.c Sort.c List.c SortTest.c GUI.c List/List.c
 include_HEADERS = argparse.h List.h GUI.h csv.h Sort.h List/List.h
-@BUILD_NSPIRE_FALSE@__top_builddir__bin_SortTest_CFLAGS = -g \
-@BUILD_NSPIRE_FALSE@	-fsanitize=address $(am__append_1)
-@BUILD_NSPIRE_TRUE@__top_builddir__bin_SortTest_CFLAGS = -Os \
-@BUILD_NSPIRE_TRUE@	$(am__append_1) -U__unix__ -DNSPIRE -marm
-@BUILD_NSPIRE_FALSE@__top_builddir__bin_SortTest_CFLAGS_fast = -Ofast -mavx2 -Wall -m64 -s -funsafe-math-optimizations
+@BUILD_NSPIRE_FALSE@__top_builddir__bin_SortTest_CFLAGS = -Ofast \
+@BUILD_NSPIRE_FALSE@	-mavx2 -Wall -m64 -s \
+@BUILD_NSPIRE_FALSE@	-funsafe-math-optimizations \
+@BUILD_NSPIRE_FALSE@	$(am__append_1)
+@BUILD_NSPIRE_TRUE@__top_builddir__bin_SortTest_CFLAGS = -Ofast \
+@BUILD_NSPIRE_TRUE@	-funsafe-math-optimizations $(am__append_1) \
+@BUILD_NSPIRE_TRUE@	-U__unix__ -DNSPIRE -marm
+@BUILD_NSPIRE_FALSE@__top_builddir__bin_SortTest_CFLAGS_debug = -g -fsanitize=address
 @BUILD_LINUX_TRUE@__top_builddir__bin_SortTest_LDADD = -lX11 -lpthread -lm
 @BUILD_WIN32_TRUE@__top_builddir__bin_SortTest_LDADD = -lgdi32
 @BUILD_NSPIRE_TRUE@__top_builddir__bin_SortTest_LDFLAGS = -Wl,--nspireio,--gc-sections

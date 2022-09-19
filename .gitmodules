@@ -1,6 +1,3 @@
-[submodule "List"]
-	path = List
-	url = https://github.com/NoHamster/List
 [submodule "src/List"]
 	path = src/List
-	url = https://github.com/NoHamster/List
+	url = git@github.com:NoHamster/List
