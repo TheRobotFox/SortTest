@@ -1,74 +1,91 @@
 #pragma once
+#include "List.h"
+#include "Sort.h"
 
-#ifdef NSPIRE
-#include <stdio.h>
-#include <errno.h>
-#include <stdlib.h>
-#include <libndls.h>
-#undef malloc
-#define PIXELS (320*240)
-//#define Sleep(ms) msleep(ms)
-void Sleep(size_t ms);
-#endif
-#if defined(_WIN32)
-#include <windows.h>
-#else
-typedef struct{
-    long top,bottom,right,left;
-} RECT;
-#endif
+#define DBGP //printf("DBG AT:%d\n", __LINE__); getchar(); getchar()
+
 #ifdef __unix__
+
 #include <pthread.h>
 #include <X11/Xlib.h>
 #include <X11/XKBlib.h>
 #include <X11/keysymdef.h>
 #include <unistd.h>
-#define Sleep(ms) usleep(ms*1000) 
+
+#define Sleep(x) usleep(x*1000)
+
+
+#elif defined(NSPIRE)
+#include <stdio.h>
+#include <errno.h>
+#include <stdlib.h>
+#include <libndls.h>
+
+#define SCREEN_X 320
+#define SCREEN_Y 240
+
+#define Sleep_while_active Sleep
+
+#elif defined(_WIN32)
+#include <windows.h>
+
 #endif
 
-#include "List.h"
-#include "Sort.h"
+#define SLEEP_RES 50
+void Sleep_while_active(size_t ms);
 
-#define SKIP 1
+#define SKIP_PIXELS 1
 #define MERGEDIS 10
 
-typedef struct {
+struct Rect
+{
+    unsigned int left,top,right,bottom;
+};
+
+struct Color
+{
+    unsigned char r,g,b;
+};
+
+struct GUI_conf
+{
     float delay;
-    #ifdef _WIN32
-    HWND hwnd;
-    HINSTANCE hinstance;
-    #endif
-    LIST* List;
-    SortAlg *Alg;
-    int max;
-    int comp1;
-    int comp2;
-    LIST *r_pointers;
-    LIST *g_pointers;
-    int skip;
     int mergedistance;
-    char active;
-    char activate;
-    char pause;
-	char rendering;
-	char no_render;
-} infoGUI;
+    int skip_pixels;
+    short mapping;
+    SortAlg *Alg;
+    int activate;
+    int active;
+    int do_render;
+};
 
-#ifdef _WIN32
-DWORD WINAPI create_gui(LPVOID info);
-#else
-void *create_gui(void* info);
-#endif
+typedef long GUI_Window_id;
 
-void gui_updateList(LIST* List);
 
-void gui_pointer1(int p);
+int GUI_create(struct GUI_conf *conf);
 
-void gui_pointer2(int p);
+void GUI_destroy();
 
-void gui_p_r_clear();
-void gui_p_g_clear();
+GUI_Window_id GUI_windows_append();
 
-void gui_update();
+void GUI_windows_remove(GUI_Window_id id);
 
-void gui_wait();
+void GUI_Window_set_list(GUI_Window_id id, List l);
+
+void GUI_Window_marks_add(GUI_Window_id id, size_t index, struct Color col);
+
+void GUI_Window_marks_remove(GUI_Window_id id, size_t index);
+
+void GUI_Window_marks_clear(GUI_Window_id id);
+
+void GUI_Window_foreground_set(GUI_Window_id id, struct Color col);
+
+void GUI_Window_background_set(GUI_Window_id id, struct Color col);
+
+void GUI_Window_do_render(GUI_Window_id id, int do_render);
+
+void GUI_update(int force);
+
+void GUI_render();
+
+void GUI_wait();

@@ -1,5 +1,6 @@
 #include "argparse.h"
 
+
 typedef struct{
     short type;
     char* name;
@@ -23,7 +24,9 @@ SortAlg Sorting_Algorithms[]= {
     {"CocktailshakerSort",CocktailshakerSort},
     {"QuickSort",QuickSort_launcher},
     {"ReculinSort", ReculinSort},
+//#ifndef NSPIRE
     {"BogoSort",BogoSort}
+//#endif
 
 
 
@@ -33,22 +36,24 @@ const int Sorting_Algorithms_count = sizeof(Sorting_Algorithms)/sizeof(SortAlg);
 //Filling Commands
 
 const FillCmd Fill_Commands[]={
-    {"fill",fill_to_n, "Normal fill 0-n"},
-    {"fill"SEP"reversed",fill_reversed,"Reverse order fill 0-n"},
-    {"fill"SEP"random",fill_random, "Fill 0-n and randomize"},
-    {"random",random_fill,"Fill with n random numbers 0-(n*10)"}
+    {"fill",List_fill_to_n, "Normal fill 0-n"},
+    {"fill"SEP"reversed",List_fill_reversed,"Reverse order fill 0-n"},
+    {"fill"SEP"random",List_fill_random, "Fill 0-n and randomize"},
+    {"random",List_random_fill,"Fill with n random numbers 0-(n*10)"}
 };
 
 const int Fill_Commands_count = sizeof(Fill_Commands)/sizeof(FillCmd);
 
 // STANDARD
 
-int getString(int arg_list_index ,arg* arg_list, int* arg_index, int argc, char** argv){
+int getString(int arg_list_index ,arg* arg_list, int* arg_index, int argc, char** argv)
+{
     arg_list[arg_list_index].str=argv[(*arg_index)+1];
     return 0;
 }
 
-int getInt(int arg_list_index ,arg* arg_list, int* arg_index, int argc, char** argv){
+int getInt(int arg_list_index ,arg* arg_list, int* arg_index, int argc, char** argv)
+{
     if(to_num(argv[(*arg_index)+1],&arg_list[arg_list_index].val)){
         sprintf( arg_list[arg_list_index].Error,"Could not interpret %s as int",argv[(*arg_index)+1]);
         return 1;
@@ -56,7 +61,8 @@ int getInt(int arg_list_index ,arg* arg_list, int* arg_index, int argc, char** a
     return 0;
 }
 
-int getFloat(int arg_list_index ,arg* arg_list, int* arg_index, int argc, char** argv){
+int getFloat(int arg_list_index ,arg* arg_list, int* arg_index, int argc, char** argv)
+{
     float x;
     if(sscanf(argv[(*arg_index)+1],"%f",&x)!=1){
         sprintf( arg_list[arg_list_index].Error,"Could not interpret %s as float",argv[(*arg_index)+1]);
@@ -66,15 +72,17 @@ int getFloat(int arg_list_index ,arg* arg_list, int* arg_index, int argc, char**
     return 0;
 }
 
-int getFlag(int arg_list_index ,arg* arg_list, int* arg_index, int argc, char** argv){
+int getFlag(int arg_list_index ,arg* arg_list, int* arg_index, int argc, char** argv)
+{
     arg_list[arg_list_index].boolean=1;
     return 0;
 }
 
 
 
-int getCSV(int arg_list_index ,arg* arg_list, int* arg_index, int argc, char** argv){
-    arg_list[arg_list_index].csv=csv(argv[(*arg_index)+1],strlen(argv[(*arg_index)+1]));
+int getCSV(int arg_list_index ,arg* arg_list, int* arg_index, int argc, char** argv)
+{
+    arg_list[arg_list_index].csv=CSV_load_string(argv[(*arg_index)+1],strlen(argv[(*arg_index)+1]));
     if(arg_list[arg_list_index].csv.size==-1){
         sprintf( arg_list[arg_list_index].Error,"Unable to create CSV");
         return -1;
@@ -83,7 +91,8 @@ int getCSV(int arg_list_index ,arg* arg_list, int* arg_index, int argc, char** a
 
 }
 
-int getFileIn(int arg_list_index ,arg* arg_list, int* arg_index, int argc, char** argv){
+int getFileIn(int arg_list_index ,arg* arg_list, int* arg_index, int argc, char** argv)
+{
     char* Path = argv[(*arg_index)+1];
     arg_list[arg_list_index].File=fopen(Path,"r");
     if (!arg_list[arg_list_index].File){
@@ -93,7 +102,8 @@ int getFileIn(int arg_list_index ,arg* arg_list, int* arg_index, int argc, char*
     return 0;
 }
 
-int getFileOut(int arg_list_index ,arg* arg_list, int* arg_index, int argc, char** argv){
+int getFileOut(int arg_list_index ,arg* arg_list, int* arg_index, int argc, char** argv)
+{
     char* Path = argv[(*arg_index)+1];
     arg_list[arg_list_index].File=fopen(Path,"w");
     if (!arg_list[arg_list_index].File){
@@ -106,35 +116,48 @@ int getFileOut(int arg_list_index ,arg* arg_list, int* arg_index, int argc, char
 
 // COSTUM
 
-int readFile(int arg_list_index ,arg* arg_list, int* arg_index, int argc, char** argv){
-    CSV csv=CSV_from_File(argv[(*arg_index)+1]);
+int readFile(int arg_list_index ,arg* arg_list, int* arg_index, int argc, char** argv)
+{
+    CSV csv=CSV_load_file(argv[(*arg_index)+1]);
     if(csv.size==-1){
         sprintf( arg_list[arg_list_index].Error,"Unable to create CSV");
         return 1;
     }
-    arg_list[arg_list_index].List=List_from_csv(csv);
-    if(arg_list[arg_list_index].List.size>-1){
-        return 0;
+
+    List l = List_create(sizeof(S_TYPE));
+    if(List_append_csv(l, csv)){
+        CSV_free(csv);
+        sprintf( arg_list[arg_list_index].Error,"Unable to create List");
+        return 1;
     }
-    sprintf( arg_list[arg_list_index].Error,"Unable to create List");
-    return 1;
+    CSV_free(csv);
+
+    arg_list[arg_list_index].l=l;
+    return 0;
 }
 
-int getList(int arg_list_index ,arg* arg_list, int* arg_index, int argc, char** argv){
-    CSV tmp = csv(argv[(*arg_index)+1],strlen(argv[(*arg_index)+1]));
-    arg_list[arg_list_index].List=List_from_csv(tmp);
-	free_CSV(tmp);
-    if(arg_list[arg_list_index].List.size>-1){
-        return 0;
+int getList(int arg_list_index ,arg* arg_list, int* arg_index, int argc, char** argv)
+{
+    CSV csv = CSV_load_string(argv[(*arg_index)+1],strlen(argv[(*arg_index)+1]));
+    List l = List_create(sizeof(S_TYPE));
+    if(List_append_csv(l, csv)){
+        CSV_free(csv);
+        sprintf( arg_list[arg_list_index].Error,"Unable to create List");
+        return 1;
     }
-    return 1;
+    CSV_free(csv);
+
+    arg_list[arg_list_index].l=l;
+    return 0;
 }
 
-int getCmd(int arg_list_index ,arg* arg_list, int* arg_index, int argc, char** argv){
-    CSV CSV = csv(argv[(*arg_index)+1],strlen(argv[(*arg_index)+1]));
-    int size=0;
-    int num=0;
-    int error;
+int getCmd(int arg_list_index ,arg* arg_list, int* arg_index, int argc, char** argv)
+{
+    CSV CSV = CSV_load_string(argv[(*arg_index)+1],strlen(argv[(*arg_index)+1]));
+    int size = 0,
+        num = 0,
+        error;
+
     for(int i=1; i<CSV.size; i+=2){
         error=to_num(CSV.data[i],&num);
         if(error){
@@ -144,16 +167,20 @@ int getCmd(int arg_list_index ,arg* arg_list, int* arg_index, int argc, char** a
         size+=num;
     }
 
-    LIST List = CreateList(size);
-    for(int c=0; c<CSV.size; c+=2){
+    List l = List_create(sizeof(S_TYPE));
+    List_reserve(l, size);
+
+    for(int c=0; c<CSV.size; c+=2)
+    {
         error=1;
-        for(int i=0; i<Fill_Commands_count; i++){
+        for(int i=0; i<Fill_Commands_count; i++)
+        {
             if (!strcmp(CSV.data[c],Fill_Commands[i].name)){
                 if(to_num(CSV.data[c+1],&num)){
                     sprintf( arg_list[arg_list_index].Error,"Could not interpret %s as integer",CSV.data[i]);
 					goto error;
                 }
-                Fill_Commands[i].func(num,&List);
+                Fill_Commands[i].func(l, num);
                 error=0;
             }
         }
@@ -162,39 +189,41 @@ int getCmd(int arg_list_index ,arg* arg_list, int* arg_index, int argc, char** a
 			goto error;
         }
     }
-    arg_list[arg_list_index].List=List;
-    free_CSV(CSV);
+    arg_list[arg_list_index].l=l;
+    CSV_free(CSV);
     return 0;
+
 	error:
-	free_CSV(CSV);
-	free_List(&List);
+	CSV_free(CSV);
+	List_free(l);
 	return 1;
 }
 
-int getAlgs(int arg_list_index ,arg* arg_list, int* arg_index, int argc, char** argv){
-    CSV CSV = csv(argv[(*arg_index)+1],strlen(argv[(*arg_index)+1]));
-    arg_list[arg_list_index].sorting_algs = malloc(sizeof(SortAlg)*CSV.size);
-    arg_list[arg_list_index].length=CSV.size;
+int getAlgs(int arg_list_index ,arg* arg_list, int* arg_index, int argc, char** argv)
+{
+    CSV csv = CSV_load_string(argv[(*arg_index)+1],strlen(argv[(*arg_index)+1]));
+    arg_list[arg_list_index].sorting_algs = malloc(csv.size*sizeof(SortAlg));
+    arg_list[arg_list_index].length=csv.size;
     int error;
-    if(CSV.size==-1){
-        printf("CSV,empty");
+    if(csv.size==-1){
+        printf("CSV is empty");
         return 1;
     }
-    for(int a=0; a<CSV.size; a++){
+    for(int a=0; a<csv.size; a++){
         error=1;
         for(int i=0; i<Sorting_Algorithms_count; i++){
-            if (!strcmp(CSV.data[a],Sorting_Algorithms[i].name)){
+            if (!strcmp(csv.data[a],Sorting_Algorithms[i].name)){
                 arg_list[arg_list_index].sorting_algs[a]=Sorting_Algorithms[i];
                 error=0;
             }
         }
         if(error){
-            sprintf( arg_list[arg_list_index].Error,"%s: algorithm does not exist",CSV.data[a]);
-            free_CSV(CSV);
+            sprintf( arg_list[arg_list_index].Error,"%s: algorithm does not exist",csv.data[a]);
+            CSV_free(csv);
             return 1;
         }
     }
-    free_CSV(CSV);
+    CSV_free(csv);
     return 0;
 }
 
@@ -230,7 +259,11 @@ arg arguments[]={
 const int arguments_count = sizeof(arguments)/sizeof(arguments[0]);
 
 
-int argparse(int argc, char** argv){
+int argparse(int argc, char** argv)
+{
+
+    for(int i=0; i<arguments_count; i++)
+        arguments[i].data = NULL;
 
     // Set defaults
     arg_get('a')->sorting_algs=&Sorting_Algorithms[0];
@@ -259,7 +292,7 @@ int argparse(int argc, char** argv){
                                 found=1;
                                 break;
                             }
-                            if(arg_resolvers[resolver].resolve(argument,&arguments[0],&arg_index,argc,argv)){
+                            if(arg_resolvers[resolver].resolve(argument,arguments,&arg_index,argc,argv)){
                                 printf("An Error occured while parsing the Argumentlist! Argument -%c could not be resolved.\n  %s\n",arguments[argument].id,arguments[argument].Error);
                                 return 1;
                             }
@@ -296,8 +329,6 @@ void print_usage(){
             printf(" - %s\n", arguments[i].describtion);
     }
 
-
-
     // Print Extra
     printf("\nSortingalgoritms:\n");
 
@@ -306,7 +337,7 @@ void print_usage(){
     }
     printf("\nFillingcommands:\n");
     for(int i=0; i<Fill_Commands_count; i++){
-        printf("  %-15s - %s\n",Fill_Commands[i].name,Fill_Commands[i].description);
+        printf(" %-13s - %s\n",Fill_Commands[i].name,Fill_Commands[i].description);
     }
 }
 

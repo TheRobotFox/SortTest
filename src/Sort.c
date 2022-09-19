@@ -1,54 +1,73 @@
 #include "Sort.h"
 #include <signal.h>
+
 static size_t comp;
 static size_t swap;
 
-void reset(){
+void status_reset()
+{
     comp=0;
     swap=0;
 }
 
-size_t getComp(){
+size_t getComp()
+{
     return comp;
 }
-size_t getSwap(){
+size_t getSwap()
+{
     return swap;
 }
 
-void Swap(unsigned int a, unsigned int b, LIST *List){
-	//if(a<0 || a>=List->size || b<0 || b<List->size){
+static void Swap(List l, size_t a, size_t b)
+{
+	//if(a<0 || a>=List_size(l) || b<0 || b<List->size){
 		//printf("OOB Swap!");
 		//raise(SIGINT);
 	//}
-    int tmp;
-    tmp=List->data[a];
-    List->data[a]=List->data[b];
-    List->data[b]=tmp;
+
     swap++;
+
+    S_TYPE tmp;
+    tmp=*(S_TYPE*)List_get(l, a);
+    *(S_TYPE*)List_get(l,a)=*(S_TYPE*)List_get(l, b);
+
+    *(S_TYPE*)List_get(l, b)=tmp;
+    GUI_update(0);
+    GUI_wait();
 }
 
-int Compare(unsigned int a, unsigned int b, LIST *List){
+static int Compare(List l, size_t a, size_t b)
+{
+    static long long int a_last=-1, b_last=-1;
     comp++;
-    gui_wait();
-    if(List){
-        gui_p_g_clear();
-        gui_p_r_clear();
-        gui_pointer1(a);
-        gui_pointer2(b);
-        return List->data[a]>List->data[b];
+    GUI_update(0);
+    GUI_wait();
+    if(l){
+
+        if(a_last!=-1){
+            GUI_Window_marks_remove(0, a_last);
+            GUI_Window_marks_remove(0, b_last);
+        }
+        GUI_Window_marks_add(0, a, (struct Color){255,0,0});
+        GUI_Window_marks_add(0, b, (struct Color){0,255,0});
+        a_last=a;
+        b_last=b;
+        return *(S_TYPE*)List_get(l, a)>*(S_TYPE*)List_get(l, b);
     }
     return a>b;
 }
 
-void BubbleSort(LIST *List){
+void BubbleSort(List l)
+{
 
     char sorted=0;
-    int size=List->size;
+    int size=List_size(l);
     while(!sorted){
         sorted=1;
         for(int i=0; i<size-1; i++){
-            if(Compare(i,i+1,List)){
-                Swap(i,i+1,List);
+            if(Compare(l,i,i+1)){
+                Swap(l,i,i+1);
                 sorted=0;
             }
         }
@@ -56,56 +75,53 @@ void BubbleSort(LIST *List){
     }
 }
 
-void Bad_BubbleSort(LIST *List){
+void Bad_BubbleSort(List l)
+{
 
-    for(int i=0; i<List->size; i++){
-        for(int x=0; x<List->size-1; x++){
-            if(Compare(x,x+1,List)){
-                Swap(x,x+1,List);
+    for(int i=0; i<List_size(l); i++){
+        for(int x=0; x<List_size(l)-1; x++){
+            if(Compare(l,x,x+1)){
+                Swap(l,x,x+1);
             }
         }
     }
 }
 
-void SelectionSort(LIST *List){
+void SelectionSort(List l)
+{
 
     int smallest_index;
-    for(int i=0; i<List->size-1;i++){
+    for(int i=0; i<List_size(l)-1;i++){
         smallest_index=i;
-        for(int e=i+1; e<List->size;e++){
-            if(Compare(smallest_index,e,List))
+        for(int e=i+1; e<List_size(l);e++){
+            if(Compare(l,smallest_index,e))
                 smallest_index=e;
         }
         if(smallest_index!=i){
-            Swap(i,smallest_index,List);
+            Swap(l,i,smallest_index);
         }
 
     }
 }
 
-void StalinSort(LIST *List){
-    int commrads = List->size;
-
-    for(int i=0; i<commrads-1;){
-        while(Compare(i,i+1,List)){
-            for(int commrad=i+1; commrad<commrads-1; commrad++){
-                List->data[commrad]=List->data[commrad+1];
+void StalinSort(List l)
+{
+    for(int i=0; i<List_size(l)-1;i++){
+        while(i<List_size(l)-1){
+            if(Compare(l,i,i+1)){
+                List_remove(l, i+1);
+                continue;
             }
-            commrads--;
-            List->data[commrads]=0;
-            List->size=commrads;
-            continue;
+            break;
         }
-        i++;
     }
 }
 
 #ifdef NSPIRE
 #define RADIX 4
 #else
-#define RADIX 256 // FASTEST 256
+#define RADIX 2 // FASTEST 256
 #endif
-#define RADIX_ITER (int)(sizeof(int)*8.0/log2(RADIX))
 
 #ifdef TCC
 void memcpy(unsigned char *a, unsigned char *b, int size){
@@ -121,72 +137,86 @@ static void ClearArray(int* a){
     }
 }
 
-void LSD_Radix(LIST *List){
+void LSD_Radix(List l)
+{
     int Counts[RADIX];
-    LIST Output=CreateList(List->size);
-    Output.filled=List->filled;
-    unsigned int *tmp;
+    List l2 = List_create(sizeof(S_TYPE)),
+         *input=&l,
+         *output=&l2;
+    List_grow(l2, List_size(l));
 
-    int iter = (int)(log2(get_max(List))/log2(RADIX)+1);
+    GUI_Window_id win = GUI_windows_append();
+    GUI_Window_set_list(win, l2);
+    GUI_Window_do_render(win, 1);
+    void *tmp;
+
+    int iter = (int)(log2(get_max(l))/log2(RADIX)+1);
 
     for(int level=0; level<iter; level++){
         int shift=(level*(int)log2(RADIX));
         ClearArray(Counts);
-        for(int i=0; i<List->size;i++){
-            Counts[(List->data[i]>>shift)&(RADIX-1)]++;
+        for(int i=0; i<List_size(*input);i++){
+            Counts[(*(S_TYPE*)List_get(*input, i)>>shift)&(RADIX-1)]++;
         }
         for(int i=1; i<RADIX; i++){
             Counts[i]+=Counts[i-1];
         }
-        for(int i=List->size-1; i>=0; i--){
-            Output.data[--Counts[(List->data[i]>>shift)&(RADIX-1)]]=List->data[i];
-            gui_wait();
+        for(int i=List_size(*input)-1; i>=0; i--){
+            *(S_TYPE*)List_get(*output,--Counts[(*(S_TYPE*)List_get(*input, i)>>shift)&(RADIX-1)]) = *(S_TYPE*)List_get(*input, i);
+            GUI_wait();
+            GUI_update(0);
         }
-        gui_updateList(&Output);
-        //memcpy(List->data,Output,List->size*sizeof(int));
-        tmp=Output.data;
-        Output.data=List->data;
-        List->data=tmp;
+
+        // swap input / output
+        tmp=input;
+        input=output;
+        output=tmp;
+
     }
-    if(RADIX_ITER%2){
-        tmp=Output.data;
-        Output.data=List->data;
-        List->data=tmp;
-    }
-    gui_updateList(List);
-    free_List(&Output);
+    // uneven iteration -> swap to main list
+    if(iter%2)
+        List_copy(l,l2);
+
+    GUI_windows_remove(win);
+    List_free(l2);
 }
 
 
-void InsertionSort(LIST *List){
-    int j;
-    unsigned int tmp;
-    for(int i=1; i<List->size;i++){
-        tmp=List->data[i];
-        gui_p_g_clear();
-        gui_pointer1(i);
+void InsertionSort(List l)
+{
+    int j, p1=-1, p2=-1;
+    S_TYPE tmp;
+    for(int i=1; i<List_size(l);i++){
+        tmp=*(S_TYPE*)List_get(l, i);
+        if(p1!=-1)
+            GUI_Window_marks_remove(0, p1);
+        GUI_Window_marks_add(0, i, (struct Color){255,0,0});
+        p1=i;
         j=i-1;
-        while(j >=0 && Compare(List->data[j],tmp,0)){
-            gui_p_r_clear();
-            gui_pointer2(j);
-            List->data[j+1]=List->data[j];
+        while(j >=0 && Compare(NULL,*(S_TYPE*)List_get(l, j),tmp)){
+            if(p2!=-1)
+                GUI_Window_marks_remove(0, p2);
+        GUI_Window_marks_add(0, j, (struct Color){0,255,0});
+            p2=j;
+            *(S_TYPE*)List_get(l, j+1)=*(S_TYPE*)List_get(l, j);
             j--;
         }
-        List->data[j+1]=tmp;
+        *(S_TYPE*)List_get(l, j+1)=tmp;
     }
 
 }
 
-void CocktailshakerSort(LIST *List){
+void CocktailshakerSort(List l)
+{
 
     unsigned int iteration=0, i=0, swaped=2;
     int direction=1;
 
     do{
         swaped--;
-        for(i+=direction; (i<List->size-iteration-1) && (i>=iteration); i+=direction){
-            if(Compare(i,i-direction,List)^(direction>0)){
-                Swap(i,i-direction,List);
+        for(i+=direction; (i<List_size(l)-iteration-1) && (i>=iteration); i+=direction){
+            if(Compare(l,i,i-direction)^(direction>0)){
+                Swap(l,i,i-direction);
                 swaped=2;
             }
         }
@@ -198,72 +228,106 @@ void CocktailshakerSort(LIST *List){
     }while(swaped>0);
 }
 
-void BogoSort(LIST *List){
-    while (Verify(List)){
-        int i=(float)rand()/RAND_MAX*(List->size-1);
-        int j=(float)rand()/RAND_MAX*(List->size-1);
-        Swap(i,j,List);
-        gui_wait();
+void BogoSort(List l)
+{
+#ifdef NSPIRE
+    while (List_verify(l) && !isKeyPressed(KEY_NSPIRE_ESC)){
+#else
+    while (List_verify(l)){
+#endif
+        int i=(float)rand()/RAND_MAX*(List_size(l)-1);
+        int j=(float)rand()/RAND_MAX*(List_size(l)-1);
+        Swap(l,i,j);
 
     }
+
 }
 
-void QuickSort(int left, int right, LIST* List){
+void QuickSort(int left, int right, List l)
+{
     if(left<right){
         unsigned int pivot = right;
         int i=left,j=right-1;
         while(i<j){
-            for(;i<right && Compare(pivot,i,List);i++);
-            for(;j>left && !Compare(pivot,j,List);j--);
+            for(;i<right && Compare(l,pivot,i);i++);
+            for(;j>left && !Compare(l,pivot,j);j--);
             if(i<j)
-                Swap(i,j,List);
+                Swap(l,i,j);
         }
-        if(Compare(i,pivot,List))
-            Swap(i,pivot,List);
-        QuickSort(left,i-1,List);
-        QuickSort(i+1,right,List);
+        if(Compare(l,i,pivot))
+            Swap(l,i,pivot);
+        QuickSort(left,i-1,l);
+        QuickSort(i+1,right,l);
     }
 }
 
-void QuickSort_launcher(LIST *List){
-    QuickSort(0,List->size-1,List);
-}
-
-
-void ReculinSort(LIST *List)
+void QuickSort_launcher(List l)
 {
-    LIST urlaub = CreateList(List->size),
-         output = CreateList(List->size);
-    gui_p_g_clear();
-    gui_p_r_clear();
+    QuickSort(0,List_size(l)-1,l);
+}
 
-    int largest = 0;
-    List_append(&output, List->data[0]);
-    for(int i=1; i<List->size; i++)
+static GUI_Window_id u, o;
+void _ReculinSort(List l, int iter)
+{
+    List urlaub = List_create(sizeof(S_TYPE)),
+         output = List_create(sizeof(S_TYPE));
+
+    GUI_Window_set_list(u, urlaub);
+    GUI_Window_set_list(o, output);
+    GUI_Window_marks_clear(0);
+
+    int largest = 0,
+        i;
+    List_append(output, List_get(l, 0));
+    GUI_Window_marks_add(0, 0, (struct Color){0,255,0});
+
+    for(i=1; i<List_size(l)-iter; i++)
     {
-        gui_wait();
-        if(List->data[i]>List->data[largest]){
-            List_append(&output, List->data[i]);
+        if(*(S_TYPE*)List_get(l, i)>*(S_TYPE*)List_get(l, largest)){
+            List_append(output, List_get(l, i));
+            GUI_Window_marks_add(0, i, (struct Color){0,255,0});
             largest=i;
-            gui_pointer1(i);
         }else{
-            List_append(&urlaub, List->data[i]);
-            gui_pointer2(i);
+            List_append(urlaub, List_get(l, i));
+            GUI_Window_marks_add(0, i, (struct Color){255,0,0});
         }
+        GUI_wait();
+        GUI_update(0);
     }
+    for(; i<List_size(l); i++)
+            List_append(output, List_get(l, i));
+
 
     //printf("%d | %d\n", urlaub.filled, output.filled);
-    if(urlaub.filled){
-        List_concat(&urlaub, &output);
-        free_List(&output);
-        void* tmp = List->data;
-        List->data=urlaub.data;
-        free(tmp);
-        ReculinSort(List);
+    if(List_size(urlaub)){
+
+        List_copy(l, urlaub);
+        List_concat(l, output);
+
+        List_free(urlaub);
+        List_free(output);
+
+        _ReculinSort(l, iter+1);
         return;
     }
-        free_List(&urlaub);
-        void* tmp = List->data;
-        List->data=output.data;
-        free(tmp);
+    List_copy(l, output);
+
+    List_free(urlaub);
+    List_free(output);
 }
+
+void ReculinSort(List l)
+{
+    u=GUI_windows_append();
+    GUI_Window_foreground_set(u, (struct Color){255,0,0});
+    GUI_Window_background_set(u, (struct Color){127,127,127});
+
+    o=GUI_windows_append();
+    GUI_Window_foreground_set(o, (struct Color){0,255,0});
+    GUI_Window_background_set(o, (struct Color){127,127,127});
+
+    _ReculinSort(l, 0);
+    GUI_windows_remove(u);
+    GUI_windows_remove(o);
+}
+

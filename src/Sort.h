@@ -6,7 +6,7 @@
 
 typedef struct {
     char* name;
-    void (*func)(LIST*);
+    void (*func)(List);
     double time_start;
     double time;
     size_t comp;
@@ -17,26 +17,26 @@ typedef struct {
 
 size_t getComp();
 size_t getSwap();
-void reset();
+void status_reset();
 
-int Verify(LIST* List);
+int Verify(List l);
 
-void BubbleSort(LIST *List);
+void BubbleSort(List l);
 
-void Bad_BubbleSort(LIST *List);
+void Bad_BubbleSort(List l);
 
-void SelectionSort(LIST *List);
+void SelectionSort(List l);
 
-void StalinSort(LIST *List);
+void StalinSort(List l);
 
-void LSD_Radix(LIST *List);
+void LSD_Radix(List l);
 
-void InsertionSort(LIST *List);
+void InsertionSort(List l);
 
-void CocktailshakerSort(LIST *List);
+void CocktailshakerSort(List l);
 
-void BogoSort(LIST *List);
+void BogoSort(List l);
 
-void QuickSort_launcher(LIST *List);
+void QuickSort_launcher(List l);
 
-void ReculinSort(LIST *List);
+void ReculinSort(List l);

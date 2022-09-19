@@ -1,7 +1,7 @@
 AC_INIT([SortTest],[6.0], [pfoch.tomke@gmail.com])
 AC_CANONICAL_HOST
 
-AM_INIT_AUTOMAKE([-Wall -Werror foreign])
+AM_INIT_AUTOMAKE([-Wall -Werror foreign subdir-objects])
 
 
 build_linux=no
@@ -16,10 +16,11 @@ case "${host_os}" in
         ;;
     cygwin*|mingw*|msys*)
         build_windows=yes
+        CC="clang"
         ;;
     nspire)
     	build_nspire=yes
-        CC="nspire-gcc"       
+        CC="nspire-gcc"   
         ;;
     *)
         AC_MSG_ERROR(["OS $host_os is not supported"])
@@ -38,11 +39,11 @@ AC_CONFIG_FILES([Makefile src/Makefile])
 AC_CONFIG_SRCDIR([src/SortTest.c])
 
 AC_CHECK_FUNCS([memset])
-AC_FUNC_MALLOC
-AC_FUNC_REALLOC
+#AC_FUNC_MALLOC
+#AC_FUNC_REALLOC
 AC_CHECK_FUNCS([pow])
 AC_CHECK_FUNCS([sqrt])
-AC_FUNC_MALLOC
+#AC_FUNC_MALLOC
 AC_PATH_X
 
 AC_OUTPUT

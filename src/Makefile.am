@@ -1,12 +1,13 @@
 bin_PROGRAMS = $(top_builddir)/bin/SortTest
-__top_builddir__bin_SortTest_SOURCES =  argparse.c csv.c Sort.c List.c SortTest.c GUI.c
-include_HEADERS = argparse.h List.h GUI.h csv.h Sort.h
+__top_builddir__bin_SortTest_SOURCES =  argparse.c csv.c Sort.c List.c SortTest.c GUI.c List/List.c
+include_HEADERS = argparse.h List.h GUI.h csv.h Sort.h List/List.h
 
 if BUILD_NSPIRE
 
 __top_builddir__bin_SortTest_CFLAGS=-Os
 else
-__top_builddir__bin_SortTest_CFLAGS=-O3 -mavx2 -m64 -s
+__top_builddir__bin_SortTest_CFLAGS_fast=-Ofast -mavx2 -Wall -m64 -s -funsafe-math-optimizations
+__top_builddir__bin_SortTest_CFLAGS=-g -fsanitize=address
 endif
 
 if BUILD_LINUX

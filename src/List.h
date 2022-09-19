@@ -4,42 +4,31 @@
 #include <time.h>
 #include <math.h>
 #include "csv.h"
-
-typedef struct {
-    unsigned int *data;
-    int size;
-    int filled;
-} LIST;
+#include "SortTest.h"
+#include "List/List.h"
 
 typedef struct{
     char* name;
-    int (*func)(int, LIST*);
+    void (*func)(List, int);
     char* description;
     int n;
 } FillCmd;
 
-LIST CreateList(int size);
+void List_fill_random(List l, int n);
 
-void printList(int line_length, LIST *List);
+void List_random_fill(List l, int n);
 
-int fill_random(int n, LIST *List);
+void List_fill_reversed(List l, int n);
 
-int random_fill(int n, LIST *List);
+void List_fill_to_n(List l, int n);
 
-int fill_reversed(int n, LIST *List);
+void List_save(List l, FILE *f);
 
-int fill_to_n(int n, LIST *List);
+unsigned int get_max(List l);
 
-LIST List_from_csv(CSV CSV);
-
-int List_to_File(FILE* path, LIST* List);
-
-void free_List(LIST* List);
-
-unsigned int get_max(LIST* List);
+int List_verify(List l);
 
 int to_num(char* str, int* num);
 
-void List_append(LIST *List, unsigned int e);
+int List_append_csv(List l, CSV  csv);
 
-void List_concat(LIST *a, LIST *b);

@@ -16,11 +16,11 @@ typedef struct{
         char* str;
         unsigned char boolean;
         void* data;
-        
+
         CSV csv;
         SortAlg* sorting_algs;
         FILE* File;
-        LIST List;
+        List l;
     };
     // unused
     int length;
