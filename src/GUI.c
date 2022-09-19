@@ -756,7 +756,8 @@ void GUI_windows_remove(GUI_Window_id id)
         struct GUI_Window *win = List_find(current_state.windows, f_win_by_id, &id);
         if(win){
             current_state.conf->do_render = 0;
-            do{Sleep(5);}while(current_state.rendering);
+            GUI_Window_do_render(id, 0);
+            while(win->rendering) Sleep(5);
             List_free(win->marks);
             List_remove(current_state.windows, win-(struct GUI_Window*)List_start(current_state.windows));
             current_state.conf->do_render = 1;
