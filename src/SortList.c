@@ -94,6 +94,7 @@ int List_verify(List l)
         }else{
             GUI_Window_marks_add(0, i, (struct Color){0,255,0});
         }
+        GUI_Window_marks_add(0, ++i, (struct Color){0,255,0});
         GUI_wait();
         GUI_update(0);
     }

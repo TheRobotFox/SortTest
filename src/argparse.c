@@ -333,6 +333,10 @@ void print_usage(){
             printf(" - %s\n", arguments[i].describtion);
     }
 
+#ifdef NSPIRE
+    getchar();
+    getchar();
+#endif
     // Print Extra
     printf("\nSortingalgoritms:\n");
 

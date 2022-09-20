@@ -308,7 +308,7 @@ static void GUI_Window_render(struct GUI_Window *win){
         for(float x=rect.left; x<=rect.right-skip; x+=skip){
 
             // Calc Rect dimentions
-            index=(int)((x-rect.left)/(float)(rect.right-1)*(list_size-1));
+            index=(int)((x-rect.left)/(float)(rect.right-1)*(list_size));
 
             line.left=x;
             line.top=rect.bottom-data[index]/(float)max*(rect.bottom-rect.top)/1.1;
