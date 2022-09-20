@@ -1,6 +1,6 @@
 bin_PROGRAMS = $(top_builddir)/bin/SortTest
-__top_builddir__bin_SortTest_SOURCES =  argparse.c csv.c Sort.c List.c SortTest.c GUI.c List/List.c
-include_HEADERS = argparse.h List.h GUI.h csv.h Sort.h List/List.h
+__top_builddir__bin_SortTest_SOURCES =  argparse.c csv.c Sort.c SortList.c SortTest.c GUI.c List/List.c
+include_HEADERS = argparse.h SortList.h GUI.h csv.h Sort.h SortTest.h List/List.h
 
 if BUILD_NSPIRE
 

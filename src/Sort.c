@@ -1,5 +1,4 @@
 #include "Sort.h"
-#include <signal.h>
 
 static size_t comp;
 static size_t swap;

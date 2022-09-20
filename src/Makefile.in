@@ -109,7 +109,7 @@ am___top_builddir__bin_SortTest_OBJECTS =  \
 	__top_builddir__bin_SortTest-argparse.$(OBJEXT) \
 	__top_builddir__bin_SortTest-csv.$(OBJEXT) \
 	__top_builddir__bin_SortTest-Sort.$(OBJEXT) \
-	__top_builddir__bin_SortTest-List.$(OBJEXT) \
+	__top_builddir__bin_SortTest-SortList.$(OBJEXT) \
 	__top_builddir__bin_SortTest-SortTest.$(OBJEXT) \
 	__top_builddir__bin_SortTest-GUI.$(OBJEXT) \
 	List/__top_builddir__bin_SortTest-List.$(OBJEXT)
@@ -302,8 +302,8 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-__top_builddir__bin_SortTest_SOURCES = argparse.c csv.c Sort.c List.c SortTest.c GUI.c List/List.c
-include_HEADERS = argparse.h List.h GUI.h csv.h Sort.h List/List.h
+__top_builddir__bin_SortTest_SOURCES = argparse.c csv.c Sort.c SortList.c SortTest.c GUI.c List/List.c
+include_HEADERS = argparse.h SortList.h GUI.h csv.h Sort.h SortTest.h List/List.h
 @BUILD_NSPIRE_FALSE@__top_builddir__bin_SortTest_CFLAGS = -Ofast \
 @BUILD_NSPIRE_FALSE@	-mavx2 -Wall -m64 -s \
 @BUILD_NSPIRE_FALSE@	-funsafe-math-optimizations \
@@ -417,8 +417,8 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/__top_builddir__bin_SortTest-GUI.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/__top_builddir__bin_SortTest-List.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/__top_builddir__bin_SortTest-Sort.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/__top_builddir__bin_SortTest-SortList.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/__top_builddir__bin_SortTest-SortTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/__top_builddir__bin_SortTest-argparse.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/__top_builddir__bin_SortTest-csv.Po@am__quote@
@@ -482,19 +482,19 @@ __top_builddir__bin_SortTest-Sort.obj: Sort.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_SortTest_CFLAGS) $(CFLAGS) -c -o __top_builddir__bin_SortTest-Sort.obj `if test -f 'Sort.c'; then $(CYGPATH_W) 'Sort.c'; else $(CYGPATH_W) '$(srcdir)/Sort.c'; fi`
 
-__top_builddir__bin_SortTest-List.o: List.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_SortTest_CFLAGS) $(CFLAGS) -MT __top_builddir__bin_SortTest-List.o -MD -MP -MF $(DEPDIR)/__top_builddir__bin_SortTest-List.Tpo -c -o __top_builddir__bin_SortTest-List.o `test -f 'List.c' || echo '$(srcdir)/'`List.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/__top_builddir__bin_SortTest-List.Tpo $(DEPDIR)/__top_builddir__bin_SortTest-List.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='List.c' object='__top_builddir__bin_SortTest-List.o' libtool=no @AMDEPBACKSLASH@
+__top_builddir__bin_SortTest-SortList.o: SortList.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_SortTest_CFLAGS) $(CFLAGS) -MT __top_builddir__bin_SortTest-SortList.o -MD -MP -MF $(DEPDIR)/__top_builddir__bin_SortTest-SortList.Tpo -c -o __top_builddir__bin_SortTest-SortList.o `test -f 'SortList.c' || echo '$(srcdir)/'`SortList.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/__top_builddir__bin_SortTest-SortList.Tpo $(DEPDIR)/__top_builddir__bin_SortTest-SortList.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='SortList.c' object='__top_builddir__bin_SortTest-SortList.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_SortTest_CFLAGS) $(CFLAGS) -c -o __top_builddir__bin_SortTest-List.o `test -f 'List.c' || echo '$(srcdir)/'`List.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_SortTest_CFLAGS) $(CFLAGS) -c -o __top_builddir__bin_SortTest-SortList.o `test -f 'SortList.c' || echo '$(srcdir)/'`SortList.c
 
-__top_builddir__bin_SortTest-List.obj: List.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_SortTest_CFLAGS) $(CFLAGS) -MT __top_builddir__bin_SortTest-List.obj -MD -MP -MF $(DEPDIR)/__top_builddir__bin_SortTest-List.Tpo -c -o __top_builddir__bin_SortTest-List.obj `if test -f 'List.c'; then $(CYGPATH_W) 'List.c'; else $(CYGPATH_W) '$(srcdir)/List.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/__top_builddir__bin_SortTest-List.Tpo $(DEPDIR)/__top_builddir__bin_SortTest-List.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='List.c' object='__top_builddir__bin_SortTest-List.obj' libtool=no @AMDEPBACKSLASH@
+__top_builddir__bin_SortTest-SortList.obj: SortList.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_SortTest_CFLAGS) $(CFLAGS) -MT __top_builddir__bin_SortTest-SortList.obj -MD -MP -MF $(DEPDIR)/__top_builddir__bin_SortTest-SortList.Tpo -c -o __top_builddir__bin_SortTest-SortList.obj `if test -f 'SortList.c'; then $(CYGPATH_W) 'SortList.c'; else $(CYGPATH_W) '$(srcdir)/SortList.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/__top_builddir__bin_SortTest-SortList.Tpo $(DEPDIR)/__top_builddir__bin_SortTest-SortList.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='SortList.c' object='__top_builddir__bin_SortTest-SortList.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_SortTest_CFLAGS) $(CFLAGS) -c -o __top_builddir__bin_SortTest-List.obj `if test -f 'List.c'; then $(CYGPATH_W) 'List.c'; else $(CYGPATH_W) '$(srcdir)/List.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_SortTest_CFLAGS) $(CFLAGS) -c -o __top_builddir__bin_SortTest-SortList.obj `if test -f 'SortList.c'; then $(CYGPATH_W) 'SortList.c'; else $(CYGPATH_W) '$(srcdir)/SortList.c'; fi`
 
 __top_builddir__bin_SortTest-SortTest.o: SortTest.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_SortTest_CFLAGS) $(CFLAGS) -MT __top_builddir__bin_SortTest-SortTest.o -MD -MP -MF $(DEPDIR)/__top_builddir__bin_SortTest-SortTest.Tpo -c -o __top_builddir__bin_SortTest-SortTest.o `test -f 'SortTest.c' || echo '$(srcdir)/'`SortTest.c

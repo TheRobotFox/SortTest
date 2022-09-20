@@ -254,6 +254,8 @@ arg arguments[]={
     {'o','O',"Output file path"},
     {'i','I',"num of iterations, results get averaged"},
     {'v','F',"Show Visualisation, float = delay"},
+    {'s', 'I', "Render stepsize (Faster but lower quality)"},
+    {'m', 'I', "Render collumn mergedistance in pixels"},
 };
 
 const int arguments_count = sizeof(arguments)/sizeof(arguments[0]);
@@ -271,6 +273,8 @@ int argparse(int argc, char** argv)
     arg_get('i')->val=1;
     arg_get('v')->f_val=-1.0;
     arg_get('o')->val=0;
+    arg_get('m')->val=SKIP_PIXELS;
+    arg_get('s')->val=MERGEDIS;
 
     for(int arg_index=1; arg_index<argc; arg_index++){
         if(argv[arg_index][0]=='-' && argv[arg_index][1]=='h'){

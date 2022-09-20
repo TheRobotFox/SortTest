@@ -1,6 +1,6 @@
 #pragma once
 #include "Sort.h"
-#include "List.h"
+#include "SortList.h"
 #include "csv.h"
 #include "GUI.h"
 #include <stdio.h>

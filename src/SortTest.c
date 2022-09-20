@@ -56,8 +56,8 @@ List Test(List SortList, SortAlg *Alg, int iterations){
         Alg->time+=clock()-Alg->time_start;
     #endif
 
-    if(List_verify(l))
-        printf("ERROR!\n%s misperformed on %d\n",Alg->name, iter);
+        if(List_verify(l))
+            printf("ERROR!\n%s misperformed on %d\n",Alg->name, iter);
 
         GUI_update(1);
 
@@ -74,9 +74,9 @@ List Test(List SortList, SortAlg *Alg, int iterations){
 
 
 #ifdef NSPIRE
-#define OUT_FORMAT "%-20s - %.3fs\n%10llu swaps %10llu compares\n\n"
+#define OUT_FORMAT "%-20s - %.3fs\n%10lu swaps %10lu compares\n\n"
 #else
-#define OUT_FORMAT "%-20s %fs %19llu swaps %19llu compares\n"
+#define OUT_FORMAT "%-20s %fs %19lu swaps %19lu compares\n"
 #endif
 
 
@@ -136,6 +136,9 @@ int main(int argc, char** argv){
     Conf.Sortalg_count=arg_get('a')->length;
     Conf.SortAlgs=arg_get('a')->sorting_algs;
     gui_conf.delay=arg_get('v')->f_val;
+    gui_conf.mergedistance=arg_get('m')->val;
+    gui_conf.skip_pixels=arg_get('s')->val;
+
     int error=0;
 
     if(Conf.iterations<=0){
@@ -193,8 +196,6 @@ int main(int argc, char** argv){
 
 
     gui_conf.activate = gui_conf.delay>0;
-    gui_conf.skip_pixels = SKIP_PIXELS;
-    gui_conf.mergedistance = MERGEDIS;
     gui_conf.do_render=1;
 
     DBGP;

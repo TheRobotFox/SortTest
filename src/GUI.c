@@ -423,7 +423,7 @@ static void* GUI_thread_proc(void*){
 }
 #elif  defined(__unix__)
 
-static void* GUI_thread_proc(void* arg){
+static void* GUI_thread_proc(void* _){
 
 	d=XOpenDisplay(NULL);
 	s=DefaultScreen(d);
@@ -532,7 +532,7 @@ static LRESULT CALLBACK _GUI_tread_proc(HWND hwnd, UINT msg, WPARAM wParam, LPAR
 
 }
 
-static DWORD WINAPI GUI_thread_proc(LPVOID){
+static DWORD WINAPI GUI_thread_proc(LPVOID _){
 
     // Create Windowclass
     const char* Name="SortTest";

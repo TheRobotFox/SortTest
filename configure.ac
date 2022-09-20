@@ -1,4 +1,4 @@
-AC_INIT([SortTest],[6.0], [pfoch.tomke@gmail.com])
+AC_INIT([SortTest],[7.1], [pfoch.tomke@gmail.com])
 AC_CANONICAL_HOST
 
 AM_INIT_AUTOMAKE([-Wall -Werror foreign subdir-objects])

@@ -1,5 +1,5 @@
 #pragma once
-#include "List.h"
+#include "SortList.h"
 #include "Sort.h"
 
 #define DBGP //printf("DBG AT:%d\n", __LINE__); getchar(); getchar()
@@ -31,11 +31,7 @@
 
 #endif
 
-#define SLEEP_RES 50
 void Sleep_while_active(size_t ms);
-
-#define SKIP_PIXELS 1
-#define MERGEDIS 10
 
 struct Rect
 {
