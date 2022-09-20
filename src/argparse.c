@@ -273,8 +273,8 @@ int argparse(int argc, char** argv)
     arg_get('i')->val=1;
     arg_get('v')->f_val=-1.0;
     arg_get('o')->val=0;
-    arg_get('m')->val=SKIP_PIXELS;
-    arg_get('s')->val=MERGEDIS;
+    arg_get('m')->val=MERGEDIS;
+    arg_get('s')->val=SKIP_PIXELS;
 
     for(int arg_index=1; arg_index<argc; arg_index++){
         if(argv[arg_index][0]=='-' && argv[arg_index][1]=='h'){
