@@ -1,18 +1,4 @@
-#include "GUI.h"
-
-struct GUI_State
-{
-    struct GUI_conf *conf;
-    List windows;
-    char paused;
-	char rendering;
-    int skip_frames;
-
-    #ifdef _WIN32
-    HWND hwnd;
-    HINSTANCE hinstance;
-    #endif
-};
+#include "GUI_impl.h"
 
 struct GUI_Mark
 {
@@ -25,6 +11,8 @@ struct GUI_Window
     GUI_Window_id id;
     List l;
     List marks;
+    char *title;
+    size_t title_len;
     struct Rect rect;
     float opacity;
     struct Color foreground;
@@ -34,232 +22,14 @@ struct GUI_Window
     int rendering;
 };
 
-static struct GUI_State current_state = {0};
-static char buff[256]="SortTest: ";
-
-// Port to System instructions:
-// 1. implement following OS specific I/O functions
-// 2. pass input to handleInput
-static struct Rect get_screen_dimensions();
-static void Draw_Rect(struct Rect *rect, struct Color col);
-static void Draw_Text(int x, int y, const char *text, size_t len, struct Color col);
-static void Draw_end();
-static void Draw_begin();
-void Sleep_while_active(size_t ms);
-
-#ifdef NSPIRE
-
-#define RGB(r, g, b) (short)( (r/8)<<11 | (g/4)<<5 | (b/8) )
-static short screenbuff[SCREEN_X*SCREEN_Y];
-
-void Sleep(size_t ms)
-{
-                // see http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0271d/CHDFDDCF.html
-                volatile unsigned *load = (unsigned*)0x900D0000;
-                volatile unsigned *control = (unsigned*)0x900D0008;
-                volatile unsigned *int_clear = (unsigned*)0x900D000C;
-                volatile unsigned *int_status = (unsigned*)0x900D0010;
-                unsigned orig_control = *control;
-                unsigned orig_load = *load;
-                *control = 0; // disable timer
-                *int_clear = 1; // clear interrupt status
-                *load = 32 * ms;
-                *control = 0b01100011; // disabled, TimerMode N/A, int, no prescale, 32-bit, One Shot -> 32khz
-                *control = 0b11100011; // enable timer
-
-                // Can't use idle() here as it acks the timer interrupt
-                volatile unsigned *intmask = IO(0xDC000008, 0xDC000010);
-                unsigned orig_mask = intmask[0];
-                intmask[1] = ~(1 << 19); // Disable all IRQs except timer
-
-                while ((*int_status & 1) == 0 && current_state.conf->active && !(isKeyPressed(KEY_NSPIRE_ESC)))
-                        __asm volatile("mcr p15, 0, %0, c7, c0, 4" : : "r"(0) ); // Wait for an interrupt to occur
-
-                intmask[1] = 0xFFFFFFFF; // Disable all IRQs
-                intmask[0] = orig_mask; // renable IRQs
-
-                *control = 0; // disable timer
-                *int_clear = 1; // clear interrupt status
-                *control = orig_control & 0b01111111; // timer still disabled
-                *load = orig_load;
-                *control = orig_control; // enable timer
-                if(isKeyPressed(KEY_NSPIRE_ESC))
-                    current_state.conf->active=0;
-}
-
-
-static void Screen_clear(void* buff){
-    memset(buff,0,SCREEN_X*SCREEN_Y*sizeof(short));
-}
-
-static void Screen_set(short* buff){
-    memcpy(REAL_SCREEN_BASE_ADDRESS,buff,sizeof(short)*SCREEN_X*SCREEN_Y);
-}
-
-
-// IO functions
-static struct Rect get_screen_dimensions()
-{
-    return (struct Rect){0, 0, SCREEN_X, SCREEN_Y};
-}
-
-static void Draw_begin()
-{
-    Screen_clear(screenbuff);
-}
-
-static void Draw_Rect(struct Rect *rect, struct Color col)
-{
-    for(int y=rect->top; y<rect->bottom; y++)
-    {
-        for(int x=rect->left; x<rect->right; x++)
-        {
-            screenbuff[(y*SCREEN_X)+x]=RGB(col.r, col.g, col.b);
-        }
-    }
-}
-
-static void Draw_Text(int x, int y, const char *text, size_t len, struct Color col)
-{
-    // implement
-}
-
-static void Draw_end()
-{
-    Screen_set(screenbuff);
-}
-
-#elif defined(_WIN32)
-
-static HANDLE Thread;
-static HBITMAP bmp;
-static HDC wndhdc, hdc;
-static RECT screen_rect;
-
-void Sleep_while_active(size_t ms)
-{
-    size_t iter = ms/SLEEP_RES;
-    for(int i=0; current_state.conf->active && i<iter; i++){
-        Sleep(SLEEP_RES);
-    }
-}
-
-// IO functions
-static struct Rect get_screen_dimensions()
-{
-    RECT rc;
-    GetClientRect(current_state.hwnd, &rc);
-    return (struct Rect){0, 0, rc.right, rc.bottom};
-}
-
-static void Draw_begin()
-{
-    GetClientRect(current_state.hwnd, &screen_rect);
-    bmp = CreateCompatibleBitmap(wndhdc,screen_rect.right,screen_rect.bottom);
-    SelectObject(hdc,bmp);
-
-    // Clear Bitmap
-    FillRect(hdc,&screen_rect,GetStockObject(BLACK_BRUSH));
-}
-
-static void Draw_Rect(struct Rect *rect, struct Color col)
-{
-    RECT rc = {rect->right, rect->top, rect->left, rect->bottom};
-    HBRUSH brush = CreateSolidBrush(RGB(col.r,col.g,col.b));
-    FillRect(hdc,&rc,brush);
-    DeleteObject(brush);
-}
-
-static void Draw_Text(int x, int y, const char *text, size_t len, struct Color col)
-{
-    SetTextColor(hdc, RGB(col.r, col.g, col.b));
-    RECT rc = {x,y,screen_rect.right,screen_rect.bottom};
-    DrawTextA(hdc, text, len, &rc,0);
-}
-
-static void Draw_end()
-{
-    BitBlt(wndhdc,0,0,screen_rect.right,screen_rect.bottom,hdc,0,0,SRCCOPY);
-    DeleteObject(bmp);
-    ValidateRect(current_state.hwnd,&screen_rect);
-}
-
-
-#elif defined(__unix__)
-
-static pthread_t Thread;
-static Display *d;
-static Window w;
-static XEvent e;
-static int s;
-static XWindowAttributes attr;
-
-#define RGB(r, g, b) (unsigned long)(r<<16 | g<<8 | b)
-
-void Sleep_while_active(size_t ms)
-{
-    size_t iter = ms/SLEEP_RES;
-    for(int i=0; current_state.conf->active && i<iter; i++){
-        Sleep(SLEEP_RES);
-    }
-}
-
-// IO functions
-
-static struct Rect get_screen_dimensions()
-{
-    struct Rect rect = {0};
-    XGetWindowAttributes(d,w,&attr);
-   	rect.right=attr.width;
-   	rect.bottom=attr.height;
-    return rect;
-}
-
-static void Draw_begin()
-{
-    struct Rect rect = get_screen_dimensions();
-    Draw_Rect(&rect, (struct Color){0,0,0});
-}
-
-static void Draw_Rect(struct Rect *rect, struct Color col)
-{
-	XGCValues v;
-	v.foreground=RGB(col.r, col.g, col.b);
-	GC color = XCreateGC(d,w,GCForeground,&v);
-   	XFillRectangle(d,w,color,rect->left,rect->top,rect->right-rect->left,rect->bottom-rect->top);
-    XFreeGC(d,color);
-}
-
-static void Draw_Text(int x, int y, const char *text, size_t len, struct Color col)
-{
-      XGCValues v;
-      v.foreground=RGB(col.r, col.g, col.b);
-    GC color = XCreateGC(d,w,GCForeground,&v);
-    XDrawString(d, w, color, x, y, text, len);
-    //printf("Text : %s | %d at %d,%d\n", text, len, x, y);
-    XFreeGC(d,color);
-}
-
-static void Draw_end()
-{
-    // TODO: Implement double Buffering
-}
-
-#endif
-
-
-enum INPUT{
-    NOTHING,
-    TOGGLE_PAUSE,
-    SPEED_UP,
-    SPEED_DOWN
-};
+struct GUI_State current_state = {0};
+static char buff[256];
 
 
 #define DELAY_MIN 0.000001
 #define DELAY_MAX 100000
 
-static void handleInput(enum INPUT e)
+void handleInput(enum INPUT e)
 {
     switch(e)
     {
@@ -330,7 +100,15 @@ static void GUI_Window_render(struct GUI_Window *win){
                 col=win->foreground;
 
             Draw_Rect(&line,col);
+
         }
+
+        if(win->title){
+            char color = 255*floor((float)(win->background.r+win->background.g+win->background.b)/255.0f/3.0f);
+            int size=(win->rect.bottom-win->rect.top)/15;
+            Draw_Text(win->rect.left, win->rect.right+32, win->title, win->title_len, size, (struct Color){color,color,color});
+        }
+
     }
 }
 
@@ -397,15 +175,12 @@ void GUI_render(){
         // Render Overlay
         if(current_state.conf->Alg){
             struct Rect rect = get_screen_dimensions();
-            int length=snprintf(buff,255,"SortTest: %-20s - %.3fs",current_state.conf->Alg->name,current_state.conf->Alg->time/CLOCKS_PER_SEC);
-            Draw_Text(0, 32, buff+10, length-10, (struct Color){255,255,255});
+            int length=snprintf(buff,255,"%-20s - %.3fs",current_state.conf->Alg->name,current_state.conf->Alg->time/CLOCKS_PER_SEC);
+            Draw_Text(0, 32, buff, length, rect.bottom/15, (struct Color){255,255,255});
 
-#ifdef _WIN32
-            SetWindowTextA(current_state.hwnd,buff);
-#endif
             // Print Pause
             if(current_state.paused){
-                Draw_Text(rect.right/2, 0, "Paused", 6, (struct Color){255,0,0});
+                Draw_Text(rect.right/2, 0, "Paused", 6, rect.bottom/15, (struct Color){255,0,0});
             }
         }
         Draw_end();
@@ -413,162 +188,47 @@ void GUI_render(){
     }
 }
 
-#if defined(NSPIRE)
-static void* GUI_thread_proc(void*){
 
-    lcd_init(SCR_320x240_16);
+int GUI_create(struct GUI_conf *conf)
+{
+    current_state.conf=conf;
+    if(!conf->activate)
+        return 0;
 
-    current_state.conf->active=1;
-
-	return NULL;
-}
-#elif  defined(__unix__)
-
-static void* GUI_thread_proc(void* _){
-
-	d=XOpenDisplay(NULL);
-	s=DefaultScreen(d);
-	w=XCreateSimpleWindow(d, RootWindow(d,s), 10,10,100,100,1, BlackPixel(d,s), BlackPixel(d,s));
-	XSelectInput(d,w, KeyPressMask | ExposureMask);
-
-	XMapWindow(d,w);
-
-    current_state.conf->active=1;
-
-	while(current_state.conf->active){
-	//	while(XNextEvent(d, &e)){
-		//	if(e.type == KeyPress){
-		//		switch(XkbKeycodeToKeysym(d,e.xkey.keycode,0,0)){
-		//		}
-
-		//	}
-		//if(e.type == Expose)
-		//	render();
-		//}
-		GUI_render();
-		Sleep(30);
-	}
-	return NULL;
-}
-#elif defined(_WIN32)
-static LRESULT CALLBACK _GUI_tread_proc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
-
-    static HFONT font;
-
-    switch(msg)
-    {
-        case WM_CREATE:
-        {
-            //Init Objects
-            wndhdc= GetDC(hwnd);
-            hdc = CreateCompatibleDC(wndhdc);
-            RECT rc;
-            GetClientRect(hwnd,&rc);
-            font = CreateFontA(rc.bottom/15,0,0,0,0,0,0,0,DEFAULT_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,0);
-
-            //Configure HDC
-            SetBkColor(hdc,RGB(0,0,0));
-            SetBkMode(hdc,TRANSPARENT);
-            SelectObject(hdc,font);
-
-            // Set UpdateTimer
-            SetTimer(hwnd,1,30,0);
-            break;
-        }
-        case WM_CLOSE:
-            DestroyWindow(hwnd);
-        break;
-        case WM_DESTROY:
-        {
-            //Free
-
-            ReleaseDC(hwnd,hdc);
-            ReleaseDC(hwnd,wndhdc);
-
-            KillTimer(hwnd,1);
-
-            PostQuitMessage(0);
-        break;
-        }
-        case WM_ERASEBKGND:
-        break;
-        case WM_PAINT:
-        {
-            if(!current_state.rendering){
-                // UpdateScreen
-                GUI_render();
-            }
-
-        break;
-        }
-        case WM_TIMER:
-        {
-            InvalidateRgn(hwnd,0,0);
-        break;
-        }
-        case WM_KEYDOWN:
-        {
-            enum INPUT event=NOTHING;
-            switch(wParam)
-            {
-            case 'P':
-                event=TOGGLE_PAUSE; break;
-
-            case VK_OEM_MINUS:
-            case VK_SUBTRACT:
-                event=SPEED_UP; break;
-            case VK_OEM_PLUS:
-            case VK_ADD:
-                event=SPEED_DOWN; break;
-            }
-            handleInput(event);
-
-        break;
-        }
-        default:
-            return DefWindowProc(hwnd, msg, wParam, lParam);
-    }
-
-    return 1;
-
-}
-
-static DWORD WINAPI GUI_thread_proc(LPVOID _){
-
-    // Create Windowclass
-    const char* Name="SortTest";
-    WNDCLASSEXA wc = {0};
-    wc.cbSize=sizeof(wc);
-    wc.lpfnWndProc=_GUI_tread_proc;
-    wc.lpszClassName=Name;
-    wc.lpszMenuName=Name;
-    wc.hbrBackground = GetStockObject(0);
-
-    if(RegisterClassExA(&wc)){
-        // Create and maintain Window
-        current_state.hwnd = CreateWindowExA(WS_EX_OVERLAPPEDWINDOW, Name, Name, WS_VISIBLE | WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL, current_state.hinstance, NULL);
-
-        if(current_state.hwnd){
-
-            current_state.conf->active=1;
-            MSG msg;
-
-            while(GetMessage(&msg, NULL, 0, 0) > 0)
-            {
-                TranslateMessage(&msg);
-                DispatchMessage(&msg);
-            }
-
-        }
-        UnregisterClassA(Name,current_state.hinstance);
-    }
-    current_state.conf->active=0;
+    current_state.windows = List_create(sizeof(struct GUI_Window));
+    current_state.rendering=0;
     current_state.paused=0;
 
-    return 0;
+    GUI_impl_create();
 
+    return 0;
 }
-#endif
+
+void GUI_destroy()
+{
+    for(struct GUI_Window *start = List_start(current_state.windows),
+                          *end = List_end(current_state.windows);
+                          start != end; start++)
+        GUI_windows_remove(start->id);
+
+    List_free(current_state.windows);
+    current_state.conf->active=0;
+
+    GUI_impl_destroy();
+}
+
+void GUI_update(int force){
+    if(current_state.conf->active){
+        static int skiped=0;
+        if(skiped>=current_state.skip_frames || force){
+            skiped=0;
+            GUI_impl_update();
+        }
+        skiped++;
+        current_state.skip_frames = 0.07/sqrt(current_state.conf->delay);
+    }
+}
+
 
 #ifdef NSPIRE
 
@@ -601,76 +261,6 @@ static void getKey(){
 }
 
 #endif
-
-
-int GUI_create(struct GUI_conf *conf)
-{
-    current_state.conf=conf;
-    if(!conf->activate)
-        return 0;
-
-    current_state.windows = List_create(sizeof(struct GUI_Window));
-    current_state.rendering=0;
-
-#ifdef _WIN32
-
-    SECURITY_ATTRIBUTES sa = {0};
-    current_state.hinstance=GetModuleHandle(0);
-    Thread = CreateThread(&sa,0,GUI_thread_proc,NULL,0,0);
-
-#elif defined(__unix__)
-
-    pthread_create(&Thread, NULL, GUI_thread_proc, NULL);
-
-#elif defined(NSPIRE)
-
-    GUI_thread_proc(NULL);
-
-#endif
-    return 0;
-}
-
-void GUI_destroy()
-{
-    for(struct GUI_Window *start = List_start(current_state.windows),
-                          *end = List_end(current_state.windows);
-                          start != end; start++)
-        GUI_windows_remove(start->id);
-
-    List_free(current_state.windows);
-    current_state.conf->active=0;
-
-    #ifdef _WIN32_
-
-    WaitForSingleObject(Thread,INFINITE);
-
-    #elif defined(__unix__)
-
-    pthread_join(Thread, NULL);
-
-    #endif
-}
-
-void GUI_update(int force){
-    if(current_state.conf->active){
-        static int skiped=0;
-        if(skiped>=current_state.skip_frames || force){
-            skiped=0;
-        #ifdef _WIN32
-        //PostMessageA(current_state.hwnd,WM_PAINT,0,0);
-		#elif defined(__unix__)
-        //GUI_render();
-		//XEvent e;
-		//XSendEvent(d,w,0,ExposureMask,&e);
-        #else
-            GUI_render();
-        #endif
-        }
-        skiped++;
-        current_state.skip_frames = 0.07/sqrt(current_state.conf->delay);
-    }
-}
-
 
 
 void GUI_wait(){

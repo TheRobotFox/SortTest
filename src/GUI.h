@@ -6,12 +6,7 @@
 
 #ifdef __unix__
 
-#include <pthread.h>
-#include <X11/Xlib.h>
-#include <X11/XKBlib.h>
-#include <X11/keysymdef.h>
 #include <unistd.h>
-
 #define Sleep(x) usleep(x*1000)
 
 
@@ -21,27 +16,13 @@
 #include <stdlib.h>
 #include <libndls.h>
 
-#define SCREEN_X 320
-#define SCREEN_Y 240
-
 #define Sleep_while_active Sleep
 
 #elif defined(_WIN32)
 #include <windows.h>
-
 #endif
 
 void Sleep_while_active(size_t ms);
-
-struct Rect
-{
-    unsigned int left,top,right,bottom;
-};
-
-struct Color
-{
-    unsigned char r,g,b;
-};
 
 struct GUI_conf
 {
@@ -53,6 +34,16 @@ struct GUI_conf
     int activate;
     int active;
     int do_render;
+};
+
+struct Color
+{
+    unsigned char r,g,b;
+};
+
+struct Rect
+{
+    unsigned int left,top,right,bottom;
 };
 
 typedef long GUI_Window_id;

@@ -1,26 +1,26 @@
-bin_PROGRAMS = $(top_builddir)/bin/SortTest
-__top_builddir__bin_SortTest_SOURCES =  argparse.c csv.c Sort.c SortList.c SortTest.c GUI.c List/List.c
-include_HEADERS = argparse.h SortList.h GUI.h csv.h Sort.h SortTest.h List/List.h
+PROGRAMS = SortTest
+SortTest_SOURCES =  argparse.c csv.c Sort.c SortList.c SortTest.c GUI.c GUI_impl_win.c GUI_impl_unix.c GUI_impl_ti.c List/List.c
+include_HEADERS = argparse.h SortList.h GUI.h csv.h Sort.h SortTest.h List/List.h GUI_impl.h
 
 if BUILD_NSPIRE
 
-__top_builddir__bin_SortTest_CFLAGS=-Ofast -funsafe-math-optimizations
+SortTest_CFLAGS=-Ofast -funsafe-math-optimizations
 else
-__top_builddir__bin_SortTest_CFLAGS=-Ofast -mavx2 -Wall -m64 -s -funsafe-math-optimizations
-__top_builddir__bin_SortTest_CFLAGS_debug=-g -fsanitize=address
+SortTest_CFLAGS=-Ofast -mavx2 -Wall -m64 -s -funsafe-math-optimizations
+SortTest_CFLAGS_debug=-g -fsanitize=address
 endif
 
 if BUILD_LINUX
-__top_builddir__bin_SortTest_LDADD=-lX11 -lpthread -lm
+SortTest_LDADD=-lX11 -lpthread -lm
 endif
 if BUILD_WIN32
-__top_builddir__bin_SortTest_LDADD=-lgdi32
-__top_builddir__bin_SortTest_CFLAGS+=-U__unix__ -D_WIN32
+SortTest_LDADD=-lgdi32
+SortTest_CFLAGS+=-U__unix__ -D_WIN32
 endif
 
 if BUILD_NSPIRE
-__top_builddir__bin_SortTest_CFLAGS+=-U__unix__ -DNSPIRE -marm
-__top_builddir__bin_SortTest_LDFLAGS=-Wl,--nspireio,--gc-sections
+SortTest_CFLAGS+=-U__unix__ -DNSPIRE -marm
+SortTest_LDFLAGS=-Wl,--nspireio,--gc-sections
 
 EXEEXT+=.elf
 

@@ -1,4 +1,4 @@
-AC_INIT([SortTest],[7.1], [pfoch.tomke@gmail.com])
+AC_INIT([SortTest],[8.0], [pfoch.tomke@gmail.com])
 AC_CANONICAL_HOST
 
 AM_INIT_AUTOMAKE([-Wall -Werror foreign subdir-objects])
@@ -38,12 +38,7 @@ AC_CONFIG_FILES([Makefile src/Makefile])
 
 AC_CONFIG_SRCDIR([src/SortTest.c])
 
-AC_CHECK_FUNCS([memset])
-#AC_FUNC_MALLOC
-#AC_FUNC_REALLOC
-AC_CHECK_FUNCS([pow])
-AC_CHECK_FUNCS([sqrt])
-#AC_FUNC_MALLOC
+AC_CHECK_FUNCS([memset pow sqrt log])
 AC_PATH_X
 
 AC_OUTPUT

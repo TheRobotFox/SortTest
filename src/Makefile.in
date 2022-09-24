@@ -112,6 +112,9 @@ am___top_builddir__bin_SortTest_OBJECTS =  \
 	__top_builddir__bin_SortTest-SortList.$(OBJEXT) \
 	__top_builddir__bin_SortTest-SortTest.$(OBJEXT) \
 	__top_builddir__bin_SortTest-GUI.$(OBJEXT) \
+	__top_builddir__bin_SortTest-GUI_impl_win.$(OBJEXT) \
+	__top_builddir__bin_SortTest-GUI_impl_unix.$(OBJEXT) \
+	__top_builddir__bin_SortTest-GUI_impl_ti.$(OBJEXT) \
 	List/__top_builddir__bin_SortTest-List.$(OBJEXT)
 __top_builddir__bin_SortTest_OBJECTS =  \
 	$(am___top_builddir__bin_SortTest_OBJECTS)
@@ -135,6 +138,9 @@ DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
 am__depfiles_remade = ./$(DEPDIR)/__top_builddir__bin_SortTest-GUI.Po \
+	./$(DEPDIR)/__top_builddir__bin_SortTest-GUI_impl_ti.Po \
+	./$(DEPDIR)/__top_builddir__bin_SortTest-GUI_impl_unix.Po \
+	./$(DEPDIR)/__top_builddir__bin_SortTest-GUI_impl_win.Po \
 	./$(DEPDIR)/__top_builddir__bin_SortTest-Sort.Po \
 	./$(DEPDIR)/__top_builddir__bin_SortTest-SortList.Po \
 	./$(DEPDIR)/__top_builddir__bin_SortTest-SortTest.Po \
@@ -310,8 +316,8 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-__top_builddir__bin_SortTest_SOURCES = argparse.c csv.c Sort.c SortList.c SortTest.c GUI.c List/List.c
-include_HEADERS = argparse.h SortList.h GUI.h csv.h Sort.h SortTest.h List/List.h
+__top_builddir__bin_SortTest_SOURCES = argparse.c csv.c Sort.c SortList.c SortTest.c GUI.c GUI_impl_win.c GUI_impl_unix.c GUI_impl_ti.c List/List.c
+include_HEADERS = argparse.h SortList.h GUI.h csv.h Sort.h SortTest.h List/List.h GUI_impl.h
 @BUILD_NSPIRE_FALSE@__top_builddir__bin_SortTest_CFLAGS = -Ofast \
 @BUILD_NSPIRE_FALSE@	-mavx2 -Wall -m64 -s \
 @BUILD_NSPIRE_FALSE@	-funsafe-math-optimizations \
@@ -425,6 +431,9 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/__top_builddir__bin_SortTest-GUI.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/__top_builddir__bin_SortTest-GUI_impl_ti.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/__top_builddir__bin_SortTest-GUI_impl_unix.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/__top_builddir__bin_SortTest-GUI_impl_win.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/__top_builddir__bin_SortTest-Sort.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/__top_builddir__bin_SortTest-SortList.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/__top_builddir__bin_SortTest-SortTest.Po@am__quote@ # am--include-marker
@@ -537,6 +546,48 @@ __top_builddir__bin_SortTest-GUI.obj: GUI.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GUI.c' object='__top_builddir__bin_SortTest-GUI.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_SortTest_CFLAGS) $(CFLAGS) -c -o __top_builddir__bin_SortTest-GUI.obj `if test -f 'GUI.c'; then $(CYGPATH_W) 'GUI.c'; else $(CYGPATH_W) '$(srcdir)/GUI.c'; fi`
+
+__top_builddir__bin_SortTest-GUI_impl_win.o: GUI_impl_win.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_SortTest_CFLAGS) $(CFLAGS) -MT __top_builddir__bin_SortTest-GUI_impl_win.o -MD -MP -MF $(DEPDIR)/__top_builddir__bin_SortTest-GUI_impl_win.Tpo -c -o __top_builddir__bin_SortTest-GUI_impl_win.o `test -f 'GUI_impl_win.c' || echo '$(srcdir)/'`GUI_impl_win.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/__top_builddir__bin_SortTest-GUI_impl_win.Tpo $(DEPDIR)/__top_builddir__bin_SortTest-GUI_impl_win.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GUI_impl_win.c' object='__top_builddir__bin_SortTest-GUI_impl_win.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_SortTest_CFLAGS) $(CFLAGS) -c -o __top_builddir__bin_SortTest-GUI_impl_win.o `test -f 'GUI_impl_win.c' || echo '$(srcdir)/'`GUI_impl_win.c
+
+__top_builddir__bin_SortTest-GUI_impl_win.obj: GUI_impl_win.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_SortTest_CFLAGS) $(CFLAGS) -MT __top_builddir__bin_SortTest-GUI_impl_win.obj -MD -MP -MF $(DEPDIR)/__top_builddir__bin_SortTest-GUI_impl_win.Tpo -c -o __top_builddir__bin_SortTest-GUI_impl_win.obj `if test -f 'GUI_impl_win.c'; then $(CYGPATH_W) 'GUI_impl_win.c'; else $(CYGPATH_W) '$(srcdir)/GUI_impl_win.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/__top_builddir__bin_SortTest-GUI_impl_win.Tpo $(DEPDIR)/__top_builddir__bin_SortTest-GUI_impl_win.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GUI_impl_win.c' object='__top_builddir__bin_SortTest-GUI_impl_win.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_SortTest_CFLAGS) $(CFLAGS) -c -o __top_builddir__bin_SortTest-GUI_impl_win.obj `if test -f 'GUI_impl_win.c'; then $(CYGPATH_W) 'GUI_impl_win.c'; else $(CYGPATH_W) '$(srcdir)/GUI_impl_win.c'; fi`
+
+__top_builddir__bin_SortTest-GUI_impl_unix.o: GUI_impl_unix.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_SortTest_CFLAGS) $(CFLAGS) -MT __top_builddir__bin_SortTest-GUI_impl_unix.o -MD -MP -MF $(DEPDIR)/__top_builddir__bin_SortTest-GUI_impl_unix.Tpo -c -o __top_builddir__bin_SortTest-GUI_impl_unix.o `test -f 'GUI_impl_unix.c' || echo '$(srcdir)/'`GUI_impl_unix.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/__top_builddir__bin_SortTest-GUI_impl_unix.Tpo $(DEPDIR)/__top_builddir__bin_SortTest-GUI_impl_unix.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GUI_impl_unix.c' object='__top_builddir__bin_SortTest-GUI_impl_unix.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_SortTest_CFLAGS) $(CFLAGS) -c -o __top_builddir__bin_SortTest-GUI_impl_unix.o `test -f 'GUI_impl_unix.c' || echo '$(srcdir)/'`GUI_impl_unix.c
+
+__top_builddir__bin_SortTest-GUI_impl_unix.obj: GUI_impl_unix.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_SortTest_CFLAGS) $(CFLAGS) -MT __top_builddir__bin_SortTest-GUI_impl_unix.obj -MD -MP -MF $(DEPDIR)/__top_builddir__bin_SortTest-GUI_impl_unix.Tpo -c -o __top_builddir__bin_SortTest-GUI_impl_unix.obj `if test -f 'GUI_impl_unix.c'; then $(CYGPATH_W) 'GUI_impl_unix.c'; else $(CYGPATH_W) '$(srcdir)/GUI_impl_unix.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/__top_builddir__bin_SortTest-GUI_impl_unix.Tpo $(DEPDIR)/__top_builddir__bin_SortTest-GUI_impl_unix.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GUI_impl_unix.c' object='__top_builddir__bin_SortTest-GUI_impl_unix.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_SortTest_CFLAGS) $(CFLAGS) -c -o __top_builddir__bin_SortTest-GUI_impl_unix.obj `if test -f 'GUI_impl_unix.c'; then $(CYGPATH_W) 'GUI_impl_unix.c'; else $(CYGPATH_W) '$(srcdir)/GUI_impl_unix.c'; fi`
+
+__top_builddir__bin_SortTest-GUI_impl_ti.o: GUI_impl_ti.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_SortTest_CFLAGS) $(CFLAGS) -MT __top_builddir__bin_SortTest-GUI_impl_ti.o -MD -MP -MF $(DEPDIR)/__top_builddir__bin_SortTest-GUI_impl_ti.Tpo -c -o __top_builddir__bin_SortTest-GUI_impl_ti.o `test -f 'GUI_impl_ti.c' || echo '$(srcdir)/'`GUI_impl_ti.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/__top_builddir__bin_SortTest-GUI_impl_ti.Tpo $(DEPDIR)/__top_builddir__bin_SortTest-GUI_impl_ti.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GUI_impl_ti.c' object='__top_builddir__bin_SortTest-GUI_impl_ti.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_SortTest_CFLAGS) $(CFLAGS) -c -o __top_builddir__bin_SortTest-GUI_impl_ti.o `test -f 'GUI_impl_ti.c' || echo '$(srcdir)/'`GUI_impl_ti.c
+
+__top_builddir__bin_SortTest-GUI_impl_ti.obj: GUI_impl_ti.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_SortTest_CFLAGS) $(CFLAGS) -MT __top_builddir__bin_SortTest-GUI_impl_ti.obj -MD -MP -MF $(DEPDIR)/__top_builddir__bin_SortTest-GUI_impl_ti.Tpo -c -o __top_builddir__bin_SortTest-GUI_impl_ti.obj `if test -f 'GUI_impl_ti.c'; then $(CYGPATH_W) 'GUI_impl_ti.c'; else $(CYGPATH_W) '$(srcdir)/GUI_impl_ti.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/__top_builddir__bin_SortTest-GUI_impl_ti.Tpo $(DEPDIR)/__top_builddir__bin_SortTest-GUI_impl_ti.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GUI_impl_ti.c' object='__top_builddir__bin_SortTest-GUI_impl_ti.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_SortTest_CFLAGS) $(CFLAGS) -c -o __top_builddir__bin_SortTest-GUI_impl_ti.obj `if test -f 'GUI_impl_ti.c'; then $(CYGPATH_W) 'GUI_impl_ti.c'; else $(CYGPATH_W) '$(srcdir)/GUI_impl_ti.c'; fi`
 
 List/__top_builddir__bin_SortTest-List.o: List/List.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_SortTest_CFLAGS) $(CFLAGS) -MT List/__top_builddir__bin_SortTest-List.o -MD -MP -MF List/$(DEPDIR)/__top_builddir__bin_SortTest-List.Tpo -c -o List/__top_builddir__bin_SortTest-List.o `test -f 'List/List.c' || echo '$(srcdir)/'`List/List.c
@@ -704,6 +755,9 @@ clean-am: clean-binPROGRAMS clean-generic clean-local mostlyclean-am
 
 distclean: distclean-am
 		-rm -f ./$(DEPDIR)/__top_builddir__bin_SortTest-GUI.Po
+	-rm -f ./$(DEPDIR)/__top_builddir__bin_SortTest-GUI_impl_ti.Po
+	-rm -f ./$(DEPDIR)/__top_builddir__bin_SortTest-GUI_impl_unix.Po
+	-rm -f ./$(DEPDIR)/__top_builddir__bin_SortTest-GUI_impl_win.Po
 	-rm -f ./$(DEPDIR)/__top_builddir__bin_SortTest-Sort.Po
 	-rm -f ./$(DEPDIR)/__top_builddir__bin_SortTest-SortList.Po
 	-rm -f ./$(DEPDIR)/__top_builddir__bin_SortTest-SortTest.Po
@@ -756,6 +810,9 @@ installcheck-am:
 
 maintainer-clean: maintainer-clean-am
 		-rm -f ./$(DEPDIR)/__top_builddir__bin_SortTest-GUI.Po
+	-rm -f ./$(DEPDIR)/__top_builddir__bin_SortTest-GUI_impl_ti.Po
+	-rm -f ./$(DEPDIR)/__top_builddir__bin_SortTest-GUI_impl_unix.Po
+	-rm -f ./$(DEPDIR)/__top_builddir__bin_SortTest-GUI_impl_win.Po
 	-rm -f ./$(DEPDIR)/__top_builddir__bin_SortTest-Sort.Po
 	-rm -f ./$(DEPDIR)/__top_builddir__bin_SortTest-SortList.Po
 	-rm -f ./$(DEPDIR)/__top_builddir__bin_SortTest-SortTest.Po
