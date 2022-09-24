@@ -226,16 +226,17 @@ static void Draw_Rect(struct Rect *rect, struct Color col)
 	XGCValues v;
 	v.foreground=RGB(col.r, col.g, col.b);
 	GC color = XCreateGC(d,w,GCForeground,&v);
-   	XFillRectangle(d,w,color,0,0,rect->right,rect->bottom);
+   	XFillRectangle(d,w,color,rect->left,rect->top,rect->right-rect->left,rect->bottom-rect->top);
     XFreeGC(d,color);
 }
 
 static void Draw_Text(int x, int y, const char *text, size_t len, struct Color col)
 {
-	XGCValues v;
-	v.foreground=RGB(col.r, col.g, col.b);
-	GC color = XCreateGC(d,w,GCForeground,&v);
+      XGCValues v;
+      v.foreground=RGB(col.r, col.g, col.b);
+    GC color = XCreateGC(d,w,GCForeground,&v);
     XDrawString(d, w, color, x, y, text, len);
+    //printf("Text : %s | %d at %d,%d\n", text, len, x, y);
     XFreeGC(d,color);
 }
 
