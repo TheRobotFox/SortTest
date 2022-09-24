@@ -13,6 +13,8 @@
 # PARTICULAR PURPOSE.
 
 @SET_MAKE@
+
+
 VPATH = @srcdir@
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
@@ -87,18 +89,34 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+bin_PROGRAMS = SortTest$(EXEEXT)
+@BUILD_WIN32_TRUE@am__append_1 = -U__unix__ -D_WIN32
+@BUILD_NSPIRE_TRUE@am__append_2 = .elf
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 DIST_COMMON = $(srcdir)/Makefile.am $(top_srcdir)/configure \
-	$(am__configure_deps) $(am__DIST_COMMON)
+	$(am__configure_deps) $(include_HEADERS) $(am__DIST_COMMON)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(install_sh) -d
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
+am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(includedir)"
+PROGRAMS = $(bin_PROGRAMS)
+am__dirstamp = $(am__leading_dot)dirstamp
+am_SortTest_OBJECTS = SortTest-argparse.$(OBJEXT) \
+	SortTest-csv.$(OBJEXT) SortTest-Sort.$(OBJEXT) \
+	SortTest-SortList.$(OBJEXT) SortTest-SortTest.$(OBJEXT) \
+	SortTest-GUI.$(OBJEXT) SortTest-GUI_impl_win.$(OBJEXT) \
+	SortTest-GUI_impl_unix.$(OBJEXT) \
+	SortTest-GUI_impl_ti.$(OBJEXT) List/SortTest-List.$(OBJEXT)
+SortTest_OBJECTS = $(am_SortTest_OBJECTS)
+SortTest_DEPENDENCIES =
+SortTest_LINK = $(CCLD) $(SortTest_CFLAGS) $(CFLAGS) \
+	$(SortTest_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -111,29 +129,69 @@ AM_V_at = $(am__v_at_@AM_V@)
 am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
 am__v_at_0 = @
 am__v_at_1 = 
-SOURCES =
-DIST_SOURCES =
-RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
-	ctags-recursive dvi-recursive html-recursive info-recursive \
-	install-data-recursive install-dvi-recursive \
-	install-exec-recursive install-html-recursive \
-	install-info-recursive install-pdf-recursive \
-	install-ps-recursive install-recursive installcheck-recursive \
-	installdirs-recursive pdf-recursive ps-recursive \
-	tags-recursive uninstall-recursive
+DEFAULT_INCLUDES = -I.@am__isrc@
+depcomp = $(SHELL) $(top_srcdir)/depcomp
+am__maybe_remake_depfiles = depfiles
+am__depfiles_remade = ./$(DEPDIR)/SortTest-GUI.Po \
+	./$(DEPDIR)/SortTest-GUI_impl_ti.Po \
+	./$(DEPDIR)/SortTest-GUI_impl_unix.Po \
+	./$(DEPDIR)/SortTest-GUI_impl_win.Po \
+	./$(DEPDIR)/SortTest-Sort.Po ./$(DEPDIR)/SortTest-SortList.Po \
+	./$(DEPDIR)/SortTest-SortTest.Po \
+	./$(DEPDIR)/SortTest-argparse.Po ./$(DEPDIR)/SortTest-csv.Po \
+	List/$(DEPDIR)/SortTest-List.Po
+am__mv = mv -f
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+am__v_lt_1 = 
+COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+AM_V_CC = $(am__v_CC_@AM_V@)
+am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
+am__v_CC_0 = @echo "  CC      " $@;
+am__v_CC_1 = 
+CCLD = $(CC)
+LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+AM_V_CCLD = $(am__v_CCLD_@AM_V@)
+am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
+am__v_CCLD_0 = @echo "  CCLD    " $@;
+am__v_CCLD_1 = 
+SOURCES = $(SortTest_SOURCES)
+DIST_SOURCES = $(SortTest_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
-RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
-  distclean-recursive maintainer-clean-recursive
-am__recursive_targets = \
-  $(RECURSIVE_TARGETS) \
-  $(RECURSIVE_CLEAN_TARGETS) \
-  $(am__extra_recursive_targets)
-AM_RECURSIVE_TARGETS = $(am__recursive_targets:-recursive=) TAGS CTAGS \
-	cscope distdir distdir-am dist dist-all distcheck
+am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
+am__vpath_adj = case $$p in \
+    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
+    *) f=$$p;; \
+  esac;
+am__strip_dir = f=`echo $$p | sed -e 's|^.*/||'`;
+am__install_max = 40
+am__nobase_strip_setup = \
+  srcdirstrip=`echo "$(srcdir)" | sed 's/[].[^$$\\*|]/\\\\&/g'`
+am__nobase_strip = \
+  for p in $$list; do echo "$$p"; done | sed -e "s|$$srcdirstrip/||"
+am__nobase_list = $(am__nobase_strip_setup); \
+  for p in $$list; do echo "$$p $$p"; done | \
+  sed "s| $$srcdirstrip/| |;"' / .*\//!s/ .*/ ./; s,\( .*\)/[^/]*$$,\1,' | \
+  $(AWK) 'BEGIN { files["."] = "" } { files[$$2] = files[$$2] " " $$1; \
+    if (++n[$$2] == $(am__install_max)) \
+      { print $$2, files[$$2]; n[$$2] = 0; files[$$2] = "" } } \
+    END { for (dir in files) print dir, files[dir] }'
+am__base_list = \
+  sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
+  sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
+am__uninstall_files_from_dir = { \
+  test -z "$$files" \
+    || { test ! -d "$$dir" && test ! -f "$$dir" && test ! -r "$$dir"; } \
+    || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
+         $(am__cd) "$$dir" && rm -f $$files; }; \
+  }
+HEADERS = $(include_HEADERS)
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
 # Read a list of newline-separated strings from the standard input,
 # and print each of them once, without duplicates.  Input order is
@@ -151,7 +209,7 @@ am__define_uniq_tagged_files = \
   unique=`for i in $$list; do \
     if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
   done | $(am__uniquify_input)`
-DIST_SUBDIRS = $(SUBDIRS)
+AM_RECURSIVE_TARGETS = cscope
 am__DIST_COMMON = $(srcdir)/Makefile.in README compile config.guess \
 	config.sub depcomp install-sh missing
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -164,31 +222,6 @@ am__remove_distdir = \
       || { sleep 5 && rm -rf "$(distdir)"; }; \
   else :; fi
 am__post_remove_distdir = $(am__remove_distdir)
-am__relativize = \
-  dir0=`pwd`; \
-  sed_first='s,^\([^/]*\)/.*$$,\1,'; \
-  sed_rest='s,^[^/]*/*,,'; \
-  sed_last='s,^.*/\([^/]*\)$$,\1,'; \
-  sed_butlast='s,/*[^/]*$$,,'; \
-  while test -n "$$dir1"; do \
-    first=`echo "$$dir1" | sed -e "$$sed_first"`; \
-    if test "$$first" != "."; then \
-      if test "$$first" = ".."; then \
-        dir2=`echo "$$dir0" | sed -e "$$sed_last"`/"$$dir2"; \
-        dir0=`echo "$$dir0" | sed -e "$$sed_butlast"`; \
-      else \
-        first2=`echo "$$dir2" | sed -e "$$sed_first"`; \
-        if test "$$first2" = "$$first"; then \
-          dir2=`echo "$$dir2" | sed -e "$$sed_rest"`; \
-        else \
-          dir2="../$$dir2"; \
-        fi; \
-        dir0="$$dir0"/"$$first"; \
-      fi; \
-    fi; \
-    dir1=`echo "$$dir1" | sed -e "$$sed_rest"`; \
-  done; \
-  reldir="$$dir2"
 DIST_ARCHIVES = $(distdir).tar.gz
 GZIP_ENV = --best
 DIST_TARGETS = dist-gzip
@@ -219,7 +252,7 @@ ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 ETAGS = @ETAGS@
-EXEEXT = @EXEEXT@
+EXEEXT = @EXEEXT@ $(am__append_2)
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -296,11 +329,25 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = src
-EXTRA_DIST = bin
-all: all-recursive
+SortTest_SOURCES = argparse.c csv.c Sort.c SortList.c SortTest.c GUI.c GUI_impl_win.c GUI_impl_unix.c GUI_impl_ti.c List/List.c
+include_HEADERS = argparse.h SortList.h GUI.h csv.h Sort.h SortTest.h List/List.h GUI_impl.h
+@BUILD_NSPIRE_FALSE@SortTest_CFLAGS = -Ofast -mavx2 -Wall -m64 -s \
+@BUILD_NSPIRE_FALSE@	-funsafe-math-optimizations \
+@BUILD_NSPIRE_FALSE@	$(am__append_1)
+@BUILD_NSPIRE_TRUE@SortTest_CFLAGS = -Ofast \
+@BUILD_NSPIRE_TRUE@	-funsafe-math-optimizations $(am__append_1) \
+@BUILD_NSPIRE_TRUE@	-U__unix__ -DNSPIRE -marm
+@BUILD_NSPIRE_FALSE@SortTest_CFLAGS_x = -g -fsanitize=address
+@BUILD_LINUX_TRUE@SortTest_LDADD = -lX11 -lpthread -lm
+@BUILD_WIN32_TRUE@SortTest_LDADD = -lgdi32
+@BUILD_NSPIRE_TRUE@SortTest_LDFLAGS = -Wl,--nspireio,--gc-sections
+@BUILD_NSPIRE_TRUE@GENZEHN = genzehn
+@BUILD_NSPIRE_TRUE@ZEHNFLAGS = --name "SortTest"
+@BUILD_NSPIRE_TRUE@EXE = $(top_builddir)/bin/SortTest
+all: all-am
 
 .SUFFIXES:
+.SUFFIXES: .c .elf .o .obj .tns .zehn
 am--refresh: Makefile
 	@:
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
@@ -334,62 +381,270 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	$(am__cd) $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 $(am__aclocal_m4_deps):
-
-# This directory's subdirectories are mostly independent; you can cd
-# into them and run 'make' without going through this Makefile.
-# To change the values of 'make' variables: instead of editing Makefiles,
-# (1) if the variable is set in 'config.status', edit 'config.status'
-#     (which will cause the Makefiles to be regenerated when you run 'make');
-# (2) otherwise, pass the desired values on the 'make' command line.
-$(am__recursive_targets):
-	@fail=; \
-	if $(am__make_keepgoing); then \
-	  failcom='fail=yes'; \
-	else \
-	  failcom='exit 1'; \
+install-binPROGRAMS: $(bin_PROGRAMS)
+	@$(NORMAL_INSTALL)
+	@list='$(bin_PROGRAMS)'; test -n "$(bindir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(bindir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(bindir)" || exit 1; \
 	fi; \
-	dot_seen=no; \
-	target=`echo $@ | sed s/-recursive//`; \
-	case "$@" in \
-	  distclean-* | maintainer-clean-*) list='$(DIST_SUBDIRS)' ;; \
-	  *) list='$(SUBDIRS)' ;; \
-	esac; \
-	for subdir in $$list; do \
-	  echo "Making $$target in $$subdir"; \
-	  if test "$$subdir" = "."; then \
-	    dot_seen=yes; \
-	    local_target="$$target-am"; \
-	  else \
-	    local_target="$$target"; \
-	  fi; \
-	  ($(am__cd) $$subdir && $(MAKE) $(AM_MAKEFLAGS) $$local_target) \
-	  || eval $$failcom; \
-	done; \
-	if test "$$dot_seen" = "no"; then \
-	  $(MAKE) $(AM_MAKEFLAGS) "$$target-am" || exit 1; \
-	fi; test -z "$$fail"
+	for p in $$list; do echo "$$p $$p"; done | \
+	sed 's/$(EXEEXT)$$//' | \
+	while read p p1; do if test -f $$p \
+	  ; then echo "$$p"; echo "$$p"; else :; fi; \
+	done | \
+	sed -e 'p;s,.*/,,;n;h' \
+	    -e 's|.*|.|' \
+	    -e 'p;x;s,.*/,,;s/$(EXEEXT)$$//;$(transform);s/$$/$(EXEEXT)/' | \
+	sed 'N;N;N;s,\n, ,g' | \
+	$(AWK) 'BEGIN { files["."] = ""; dirs["."] = 1 } \
+	  { d=$$3; if (dirs[d] != 1) { print "d", d; dirs[d] = 1 } \
+	    if ($$2 == $$4) files[d] = files[d] " " $$1; \
+	    else { print "f", $$3 "/" $$4, $$1; } } \
+	  END { for (d in files) print "f", d, files[d] }' | \
+	while read type dir files; do \
+	    if test "$$dir" = .; then dir=; else dir=/$$dir; fi; \
+	    test -z "$$files" || { \
+	      echo " $(INSTALL_PROGRAM_ENV) $(INSTALL_PROGRAM) $$files '$(DESTDIR)$(bindir)$$dir'"; \
+	      $(INSTALL_PROGRAM_ENV) $(INSTALL_PROGRAM) $$files "$(DESTDIR)$(bindir)$$dir" || exit $$?; \
+	    } \
+	; done
+
+uninstall-binPROGRAMS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(bin_PROGRAMS)'; test -n "$(bindir)" || list=; \
+	files=`for p in $$list; do echo "$$p"; done | \
+	  sed -e 'h;s,^.*/,,;s/$(EXEEXT)$$//;$(transform)' \
+	      -e 's/$$/$(EXEEXT)/' \
+	`; \
+	test -n "$$list" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(bindir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(bindir)" && rm -f $$files
+
+clean-binPROGRAMS:
+	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
+List/$(am__dirstamp):
+	@$(MKDIR_P) List
+	@: > List/$(am__dirstamp)
+List/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) List/$(DEPDIR)
+	@: > List/$(DEPDIR)/$(am__dirstamp)
+List/SortTest-List.$(OBJEXT): List/$(am__dirstamp) \
+	List/$(DEPDIR)/$(am__dirstamp)
+
+SortTest$(EXEEXT): $(SortTest_OBJECTS) $(SortTest_DEPENDENCIES) $(EXTRA_SortTest_DEPENDENCIES) 
+	@rm -f SortTest$(EXEEXT)
+	$(AM_V_CCLD)$(SortTest_LINK) $(SortTest_OBJECTS) $(SortTest_LDADD) $(LIBS)
+
+mostlyclean-compile:
+	-rm -f *.$(OBJEXT)
+	-rm -f List/*.$(OBJEXT)
+
+distclean-compile:
+	-rm -f *.tab.c
+
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SortTest-GUI.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SortTest-GUI_impl_ti.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SortTest-GUI_impl_unix.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SortTest-GUI_impl_win.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SortTest-Sort.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SortTest-SortList.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SortTest-SortTest.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SortTest-argparse.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SortTest-csv.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@List/$(DEPDIR)/SortTest-List.Po@am__quote@ # am--include-marker
+
+$(am__depfiles_remade):
+	@$(MKDIR_P) $(@D)
+	@echo '# dummy' >$@-t && $(am__mv) $@-t $@
+
+am--depfiles: $(am__depfiles_remade)
+
+.c.o:
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
+@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+@am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c -o $@ $<
+
+.c.obj:
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
+@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\
+@am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+
+SortTest-argparse.o: argparse.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(SortTest_CFLAGS) $(CFLAGS) -MT SortTest-argparse.o -MD -MP -MF $(DEPDIR)/SortTest-argparse.Tpo -c -o SortTest-argparse.o `test -f 'argparse.c' || echo '$(srcdir)/'`argparse.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/SortTest-argparse.Tpo $(DEPDIR)/SortTest-argparse.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='argparse.c' object='SortTest-argparse.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(SortTest_CFLAGS) $(CFLAGS) -c -o SortTest-argparse.o `test -f 'argparse.c' || echo '$(srcdir)/'`argparse.c
+
+SortTest-argparse.obj: argparse.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(SortTest_CFLAGS) $(CFLAGS) -MT SortTest-argparse.obj -MD -MP -MF $(DEPDIR)/SortTest-argparse.Tpo -c -o SortTest-argparse.obj `if test -f 'argparse.c'; then $(CYGPATH_W) 'argparse.c'; else $(CYGPATH_W) '$(srcdir)/argparse.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/SortTest-argparse.Tpo $(DEPDIR)/SortTest-argparse.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='argparse.c' object='SortTest-argparse.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(SortTest_CFLAGS) $(CFLAGS) -c -o SortTest-argparse.obj `if test -f 'argparse.c'; then $(CYGPATH_W) 'argparse.c'; else $(CYGPATH_W) '$(srcdir)/argparse.c'; fi`
+
+SortTest-csv.o: csv.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(SortTest_CFLAGS) $(CFLAGS) -MT SortTest-csv.o -MD -MP -MF $(DEPDIR)/SortTest-csv.Tpo -c -o SortTest-csv.o `test -f 'csv.c' || echo '$(srcdir)/'`csv.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/SortTest-csv.Tpo $(DEPDIR)/SortTest-csv.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='csv.c' object='SortTest-csv.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(SortTest_CFLAGS) $(CFLAGS) -c -o SortTest-csv.o `test -f 'csv.c' || echo '$(srcdir)/'`csv.c
+
+SortTest-csv.obj: csv.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(SortTest_CFLAGS) $(CFLAGS) -MT SortTest-csv.obj -MD -MP -MF $(DEPDIR)/SortTest-csv.Tpo -c -o SortTest-csv.obj `if test -f 'csv.c'; then $(CYGPATH_W) 'csv.c'; else $(CYGPATH_W) '$(srcdir)/csv.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/SortTest-csv.Tpo $(DEPDIR)/SortTest-csv.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='csv.c' object='SortTest-csv.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(SortTest_CFLAGS) $(CFLAGS) -c -o SortTest-csv.obj `if test -f 'csv.c'; then $(CYGPATH_W) 'csv.c'; else $(CYGPATH_W) '$(srcdir)/csv.c'; fi`
+
+SortTest-Sort.o: Sort.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(SortTest_CFLAGS) $(CFLAGS) -MT SortTest-Sort.o -MD -MP -MF $(DEPDIR)/SortTest-Sort.Tpo -c -o SortTest-Sort.o `test -f 'Sort.c' || echo '$(srcdir)/'`Sort.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/SortTest-Sort.Tpo $(DEPDIR)/SortTest-Sort.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Sort.c' object='SortTest-Sort.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(SortTest_CFLAGS) $(CFLAGS) -c -o SortTest-Sort.o `test -f 'Sort.c' || echo '$(srcdir)/'`Sort.c
+
+SortTest-Sort.obj: Sort.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(SortTest_CFLAGS) $(CFLAGS) -MT SortTest-Sort.obj -MD -MP -MF $(DEPDIR)/SortTest-Sort.Tpo -c -o SortTest-Sort.obj `if test -f 'Sort.c'; then $(CYGPATH_W) 'Sort.c'; else $(CYGPATH_W) '$(srcdir)/Sort.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/SortTest-Sort.Tpo $(DEPDIR)/SortTest-Sort.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Sort.c' object='SortTest-Sort.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(SortTest_CFLAGS) $(CFLAGS) -c -o SortTest-Sort.obj `if test -f 'Sort.c'; then $(CYGPATH_W) 'Sort.c'; else $(CYGPATH_W) '$(srcdir)/Sort.c'; fi`
+
+SortTest-SortList.o: SortList.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(SortTest_CFLAGS) $(CFLAGS) -MT SortTest-SortList.o -MD -MP -MF $(DEPDIR)/SortTest-SortList.Tpo -c -o SortTest-SortList.o `test -f 'SortList.c' || echo '$(srcdir)/'`SortList.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/SortTest-SortList.Tpo $(DEPDIR)/SortTest-SortList.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='SortList.c' object='SortTest-SortList.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(SortTest_CFLAGS) $(CFLAGS) -c -o SortTest-SortList.o `test -f 'SortList.c' || echo '$(srcdir)/'`SortList.c
+
+SortTest-SortList.obj: SortList.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(SortTest_CFLAGS) $(CFLAGS) -MT SortTest-SortList.obj -MD -MP -MF $(DEPDIR)/SortTest-SortList.Tpo -c -o SortTest-SortList.obj `if test -f 'SortList.c'; then $(CYGPATH_W) 'SortList.c'; else $(CYGPATH_W) '$(srcdir)/SortList.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/SortTest-SortList.Tpo $(DEPDIR)/SortTest-SortList.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='SortList.c' object='SortTest-SortList.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(SortTest_CFLAGS) $(CFLAGS) -c -o SortTest-SortList.obj `if test -f 'SortList.c'; then $(CYGPATH_W) 'SortList.c'; else $(CYGPATH_W) '$(srcdir)/SortList.c'; fi`
+
+SortTest-SortTest.o: SortTest.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(SortTest_CFLAGS) $(CFLAGS) -MT SortTest-SortTest.o -MD -MP -MF $(DEPDIR)/SortTest-SortTest.Tpo -c -o SortTest-SortTest.o `test -f 'SortTest.c' || echo '$(srcdir)/'`SortTest.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/SortTest-SortTest.Tpo $(DEPDIR)/SortTest-SortTest.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='SortTest.c' object='SortTest-SortTest.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(SortTest_CFLAGS) $(CFLAGS) -c -o SortTest-SortTest.o `test -f 'SortTest.c' || echo '$(srcdir)/'`SortTest.c
+
+SortTest-SortTest.obj: SortTest.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(SortTest_CFLAGS) $(CFLAGS) -MT SortTest-SortTest.obj -MD -MP -MF $(DEPDIR)/SortTest-SortTest.Tpo -c -o SortTest-SortTest.obj `if test -f 'SortTest.c'; then $(CYGPATH_W) 'SortTest.c'; else $(CYGPATH_W) '$(srcdir)/SortTest.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/SortTest-SortTest.Tpo $(DEPDIR)/SortTest-SortTest.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='SortTest.c' object='SortTest-SortTest.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(SortTest_CFLAGS) $(CFLAGS) -c -o SortTest-SortTest.obj `if test -f 'SortTest.c'; then $(CYGPATH_W) 'SortTest.c'; else $(CYGPATH_W) '$(srcdir)/SortTest.c'; fi`
+
+SortTest-GUI.o: GUI.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(SortTest_CFLAGS) $(CFLAGS) -MT SortTest-GUI.o -MD -MP -MF $(DEPDIR)/SortTest-GUI.Tpo -c -o SortTest-GUI.o `test -f 'GUI.c' || echo '$(srcdir)/'`GUI.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/SortTest-GUI.Tpo $(DEPDIR)/SortTest-GUI.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GUI.c' object='SortTest-GUI.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(SortTest_CFLAGS) $(CFLAGS) -c -o SortTest-GUI.o `test -f 'GUI.c' || echo '$(srcdir)/'`GUI.c
+
+SortTest-GUI.obj: GUI.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(SortTest_CFLAGS) $(CFLAGS) -MT SortTest-GUI.obj -MD -MP -MF $(DEPDIR)/SortTest-GUI.Tpo -c -o SortTest-GUI.obj `if test -f 'GUI.c'; then $(CYGPATH_W) 'GUI.c'; else $(CYGPATH_W) '$(srcdir)/GUI.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/SortTest-GUI.Tpo $(DEPDIR)/SortTest-GUI.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GUI.c' object='SortTest-GUI.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(SortTest_CFLAGS) $(CFLAGS) -c -o SortTest-GUI.obj `if test -f 'GUI.c'; then $(CYGPATH_W) 'GUI.c'; else $(CYGPATH_W) '$(srcdir)/GUI.c'; fi`
+
+SortTest-GUI_impl_win.o: GUI_impl_win.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(SortTest_CFLAGS) $(CFLAGS) -MT SortTest-GUI_impl_win.o -MD -MP -MF $(DEPDIR)/SortTest-GUI_impl_win.Tpo -c -o SortTest-GUI_impl_win.o `test -f 'GUI_impl_win.c' || echo '$(srcdir)/'`GUI_impl_win.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/SortTest-GUI_impl_win.Tpo $(DEPDIR)/SortTest-GUI_impl_win.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GUI_impl_win.c' object='SortTest-GUI_impl_win.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(SortTest_CFLAGS) $(CFLAGS) -c -o SortTest-GUI_impl_win.o `test -f 'GUI_impl_win.c' || echo '$(srcdir)/'`GUI_impl_win.c
+
+SortTest-GUI_impl_win.obj: GUI_impl_win.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(SortTest_CFLAGS) $(CFLAGS) -MT SortTest-GUI_impl_win.obj -MD -MP -MF $(DEPDIR)/SortTest-GUI_impl_win.Tpo -c -o SortTest-GUI_impl_win.obj `if test -f 'GUI_impl_win.c'; then $(CYGPATH_W) 'GUI_impl_win.c'; else $(CYGPATH_W) '$(srcdir)/GUI_impl_win.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/SortTest-GUI_impl_win.Tpo $(DEPDIR)/SortTest-GUI_impl_win.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GUI_impl_win.c' object='SortTest-GUI_impl_win.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(SortTest_CFLAGS) $(CFLAGS) -c -o SortTest-GUI_impl_win.obj `if test -f 'GUI_impl_win.c'; then $(CYGPATH_W) 'GUI_impl_win.c'; else $(CYGPATH_W) '$(srcdir)/GUI_impl_win.c'; fi`
+
+SortTest-GUI_impl_unix.o: GUI_impl_unix.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(SortTest_CFLAGS) $(CFLAGS) -MT SortTest-GUI_impl_unix.o -MD -MP -MF $(DEPDIR)/SortTest-GUI_impl_unix.Tpo -c -o SortTest-GUI_impl_unix.o `test -f 'GUI_impl_unix.c' || echo '$(srcdir)/'`GUI_impl_unix.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/SortTest-GUI_impl_unix.Tpo $(DEPDIR)/SortTest-GUI_impl_unix.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GUI_impl_unix.c' object='SortTest-GUI_impl_unix.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(SortTest_CFLAGS) $(CFLAGS) -c -o SortTest-GUI_impl_unix.o `test -f 'GUI_impl_unix.c' || echo '$(srcdir)/'`GUI_impl_unix.c
+
+SortTest-GUI_impl_unix.obj: GUI_impl_unix.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(SortTest_CFLAGS) $(CFLAGS) -MT SortTest-GUI_impl_unix.obj -MD -MP -MF $(DEPDIR)/SortTest-GUI_impl_unix.Tpo -c -o SortTest-GUI_impl_unix.obj `if test -f 'GUI_impl_unix.c'; then $(CYGPATH_W) 'GUI_impl_unix.c'; else $(CYGPATH_W) '$(srcdir)/GUI_impl_unix.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/SortTest-GUI_impl_unix.Tpo $(DEPDIR)/SortTest-GUI_impl_unix.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GUI_impl_unix.c' object='SortTest-GUI_impl_unix.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(SortTest_CFLAGS) $(CFLAGS) -c -o SortTest-GUI_impl_unix.obj `if test -f 'GUI_impl_unix.c'; then $(CYGPATH_W) 'GUI_impl_unix.c'; else $(CYGPATH_W) '$(srcdir)/GUI_impl_unix.c'; fi`
+
+SortTest-GUI_impl_ti.o: GUI_impl_ti.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(SortTest_CFLAGS) $(CFLAGS) -MT SortTest-GUI_impl_ti.o -MD -MP -MF $(DEPDIR)/SortTest-GUI_impl_ti.Tpo -c -o SortTest-GUI_impl_ti.o `test -f 'GUI_impl_ti.c' || echo '$(srcdir)/'`GUI_impl_ti.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/SortTest-GUI_impl_ti.Tpo $(DEPDIR)/SortTest-GUI_impl_ti.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GUI_impl_ti.c' object='SortTest-GUI_impl_ti.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(SortTest_CFLAGS) $(CFLAGS) -c -o SortTest-GUI_impl_ti.o `test -f 'GUI_impl_ti.c' || echo '$(srcdir)/'`GUI_impl_ti.c
+
+SortTest-GUI_impl_ti.obj: GUI_impl_ti.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(SortTest_CFLAGS) $(CFLAGS) -MT SortTest-GUI_impl_ti.obj -MD -MP -MF $(DEPDIR)/SortTest-GUI_impl_ti.Tpo -c -o SortTest-GUI_impl_ti.obj `if test -f 'GUI_impl_ti.c'; then $(CYGPATH_W) 'GUI_impl_ti.c'; else $(CYGPATH_W) '$(srcdir)/GUI_impl_ti.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/SortTest-GUI_impl_ti.Tpo $(DEPDIR)/SortTest-GUI_impl_ti.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GUI_impl_ti.c' object='SortTest-GUI_impl_ti.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(SortTest_CFLAGS) $(CFLAGS) -c -o SortTest-GUI_impl_ti.obj `if test -f 'GUI_impl_ti.c'; then $(CYGPATH_W) 'GUI_impl_ti.c'; else $(CYGPATH_W) '$(srcdir)/GUI_impl_ti.c'; fi`
+
+List/SortTest-List.o: List/List.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(SortTest_CFLAGS) $(CFLAGS) -MT List/SortTest-List.o -MD -MP -MF List/$(DEPDIR)/SortTest-List.Tpo -c -o List/SortTest-List.o `test -f 'List/List.c' || echo '$(srcdir)/'`List/List.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) List/$(DEPDIR)/SortTest-List.Tpo List/$(DEPDIR)/SortTest-List.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='List/List.c' object='List/SortTest-List.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(SortTest_CFLAGS) $(CFLAGS) -c -o List/SortTest-List.o `test -f 'List/List.c' || echo '$(srcdir)/'`List/List.c
+
+List/SortTest-List.obj: List/List.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(SortTest_CFLAGS) $(CFLAGS) -MT List/SortTest-List.obj -MD -MP -MF List/$(DEPDIR)/SortTest-List.Tpo -c -o List/SortTest-List.obj `if test -f 'List/List.c'; then $(CYGPATH_W) 'List/List.c'; else $(CYGPATH_W) '$(srcdir)/List/List.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) List/$(DEPDIR)/SortTest-List.Tpo List/$(DEPDIR)/SortTest-List.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='List/List.c' object='List/SortTest-List.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(SortTest_CFLAGS) $(CFLAGS) -c -o List/SortTest-List.obj `if test -f 'List/List.c'; then $(CYGPATH_W) 'List/List.c'; else $(CYGPATH_W) '$(srcdir)/List/List.c'; fi`
+install-includeHEADERS: $(include_HEADERS)
+	@$(NORMAL_INSTALL)
+	@list='$(include_HEADERS)'; test -n "$(includedir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(includedir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(includedir)" || exit 1; \
+	fi; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(includedir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(includedir)" || exit $$?; \
+	done
+
+uninstall-includeHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(include_HEADERS)'; test -n "$(includedir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	dir='$(DESTDIR)$(includedir)'; $(am__uninstall_files_from_dir)
 
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique
-tags: tags-recursive
+tags: tags-am
 TAGS: tags
 
 tags-am: $(TAGS_DEPENDENCIES) $(am__tagged_files)
 	set x; \
 	here=`pwd`; \
-	if ($(ETAGS) --etags-include --version) >/dev/null 2>&1; then \
-	  include_option=--etags-include; \
-	  empty_fix=.; \
-	else \
-	  include_option=--include; \
-	  empty_fix=; \
-	fi; \
-	list='$(SUBDIRS)'; for subdir in $$list; do \
-	  if test "$$subdir" = .; then :; else \
-	    test ! -f $$subdir/TAGS || \
-	      set "$$@" "$$include_option=$$here/$$subdir/TAGS"; \
-	  fi; \
-	done; \
 	$(am__define_uniq_tagged_files); \
 	shift; \
 	if test -z "$(ETAGS_ARGS)$$*$$unique"; then :; else \
@@ -402,7 +657,7 @@ tags-am: $(TAGS_DEPENDENCIES) $(am__tagged_files)
 	      $$unique; \
 	  fi; \
 	fi
-ctags: ctags-recursive
+ctags: ctags-am
 
 CTAGS: ctags
 ctags-am: $(TAGS_DEPENDENCIES) $(am__tagged_files)
@@ -421,7 +676,7 @@ cscope: cscope.files
 clean-cscope:
 	-rm -f cscope.files
 cscope.files: clean-cscope cscopelist
-cscopelist: cscopelist-recursive
+cscopelist: cscopelist-am
 
 cscopelist-am: $(am__tagged_files)
 	list='$(am__tagged_files)'; \
@@ -473,31 +728,6 @@ distdir-am: $(DISTFILES)
 	    test -f "$(distdir)/$$file" \
 	    || cp -p $$d/$$file "$(distdir)/$$file" \
 	    || exit 1; \
-	  fi; \
-	done
-	@list='$(DIST_SUBDIRS)'; for subdir in $$list; do \
-	  if test "$$subdir" = .; then :; else \
-	    $(am__make_dryrun) \
-	      || test -d "$(distdir)/$$subdir" \
-	      || $(MKDIR_P) "$(distdir)/$$subdir" \
-	      || exit 1; \
-	    dir1=$$subdir; dir2="$(distdir)/$$subdir"; \
-	    $(am__relativize); \
-	    new_distdir=$$reldir; \
-	    dir1=$$subdir; dir2="$(top_distdir)"; \
-	    $(am__relativize); \
-	    new_top_distdir=$$reldir; \
-	    echo " (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) top_distdir="$$new_top_distdir" distdir="$$new_distdir" \\"; \
-	    echo "     am__remove_distdir=: am__skip_length_check=: am__skip_mode_fix=: distdir)"; \
-	    ($(am__cd) $$subdir && \
-	      $(MAKE) $(AM_MAKEFLAGS) \
-	        top_distdir="$$new_top_distdir" \
-	        distdir="$$new_distdir" \
-		am__remove_distdir=: \
-		am__skip_length_check=: \
-		am__skip_mode_fix=: \
-	        distdir) \
-	      || exit 1; \
 	  fi; \
 	done
 	-test -n "$(am__skip_mode_fix)" \
@@ -638,19 +868,21 @@ distcleancheck: distclean
 	       $(distcleancheck_listfiles) ; \
 	       exit 1; } >&2
 check-am: all-am
-check: check-recursive
-all-am: Makefile
-installdirs: installdirs-recursive
-installdirs-am:
-install: install-recursive
-install-exec: install-exec-recursive
-install-data: install-data-recursive
-uninstall: uninstall-recursive
+check: check-am
+all-am: Makefile $(PROGRAMS) $(HEADERS)
+installdirs:
+	for dir in "$(DESTDIR)$(bindir)" "$(DESTDIR)$(includedir)"; do \
+	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
+	done
+install: install-am
+install-exec: install-exec-am
+install-data: install-data-am
+uninstall: uninstall-am
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 
-installcheck: installcheck-recursive
+installcheck: installcheck-am
 install-strip:
 	if test -z '$(STRIP)'; then \
 	  $(MAKE) $(AM_MAKEFLAGS) INSTALL_PROGRAM="$(INSTALL_STRIP_PROGRAM)" \
@@ -668,98 +900,139 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+	-rm -f List/$(DEPDIR)/$(am__dirstamp)
+	-rm -f List/$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-clean: clean-recursive
+@BUILD_NSPIRE_FALSE@clean-local:
+clean: clean-am
 
-clean-am: clean-generic mostlyclean-am
+clean-am: clean-binPROGRAMS clean-generic clean-local mostlyclean-am
 
-distclean: distclean-recursive
+distclean: distclean-am
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
+		-rm -f ./$(DEPDIR)/SortTest-GUI.Po
+	-rm -f ./$(DEPDIR)/SortTest-GUI_impl_ti.Po
+	-rm -f ./$(DEPDIR)/SortTest-GUI_impl_unix.Po
+	-rm -f ./$(DEPDIR)/SortTest-GUI_impl_win.Po
+	-rm -f ./$(DEPDIR)/SortTest-Sort.Po
+	-rm -f ./$(DEPDIR)/SortTest-SortList.Po
+	-rm -f ./$(DEPDIR)/SortTest-SortTest.Po
+	-rm -f ./$(DEPDIR)/SortTest-argparse.Po
+	-rm -f ./$(DEPDIR)/SortTest-csv.Po
+	-rm -f List/$(DEPDIR)/SortTest-List.Po
 	-rm -f Makefile
-distclean-am: clean-am distclean-generic distclean-tags
+distclean-am: clean-am distclean-compile distclean-generic \
+	distclean-tags
 
-dvi: dvi-recursive
+dvi: dvi-am
 
 dvi-am:
 
-html: html-recursive
+html: html-am
 
 html-am:
 
-info: info-recursive
+info: info-am
 
 info-am:
 
-install-data-am:
+install-data-am: install-includeHEADERS
 
-install-dvi: install-dvi-recursive
+install-dvi: install-dvi-am
 
 install-dvi-am:
 
-install-exec-am:
+install-exec-am: install-binPROGRAMS
 
-install-html: install-html-recursive
+install-html: install-html-am
 
 install-html-am:
 
-install-info: install-info-recursive
+install-info: install-info-am
 
 install-info-am:
 
 install-man:
 
-install-pdf: install-pdf-recursive
+install-pdf: install-pdf-am
 
 install-pdf-am:
 
-install-ps: install-ps-recursive
+install-ps: install-ps-am
 
 install-ps-am:
 
 installcheck-am:
 
-maintainer-clean: maintainer-clean-recursive
+maintainer-clean: maintainer-clean-am
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
+		-rm -f ./$(DEPDIR)/SortTest-GUI.Po
+	-rm -f ./$(DEPDIR)/SortTest-GUI_impl_ti.Po
+	-rm -f ./$(DEPDIR)/SortTest-GUI_impl_unix.Po
+	-rm -f ./$(DEPDIR)/SortTest-GUI_impl_win.Po
+	-rm -f ./$(DEPDIR)/SortTest-Sort.Po
+	-rm -f ./$(DEPDIR)/SortTest-SortList.Po
+	-rm -f ./$(DEPDIR)/SortTest-SortTest.Po
+	-rm -f ./$(DEPDIR)/SortTest-argparse.Po
+	-rm -f ./$(DEPDIR)/SortTest-csv.Po
+	-rm -f List/$(DEPDIR)/SortTest-List.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
-mostlyclean: mostlyclean-recursive
+mostlyclean: mostlyclean-am
 
-mostlyclean-am: mostlyclean-generic
+mostlyclean-am: mostlyclean-compile mostlyclean-generic
 
-pdf: pdf-recursive
+pdf: pdf-am
 
 pdf-am:
 
-ps: ps-recursive
+ps: ps-am
 
 ps-am:
 
-uninstall-am:
+uninstall-am: uninstall-binPROGRAMS uninstall-includeHEADERS
 
-.MAKE: $(am__recursive_targets) install-am install-strip
+.MAKE: install-am install-strip
 
-.PHONY: $(am__recursive_targets) CTAGS GTAGS TAGS all all-am \
-	am--refresh check check-am clean clean-cscope clean-generic \
-	cscope cscopelist-am ctags ctags-am dist dist-all dist-bzip2 \
-	dist-gzip dist-lzip dist-shar dist-tarZ dist-xz dist-zip \
-	dist-zstd distcheck distclean distclean-generic distclean-tags \
-	distcleancheck distdir distuninstallcheck dvi dvi-am html \
-	html-am info info-am install install-am install-data \
+.PHONY: CTAGS GTAGS TAGS all all-am am--depfiles am--refresh check \
+	check-am clean clean-binPROGRAMS clean-cscope clean-generic \
+	clean-local cscope cscopelist-am ctags ctags-am dist dist-all \
+	dist-bzip2 dist-gzip dist-lzip dist-shar dist-tarZ dist-xz \
+	dist-zip dist-zstd distcheck distclean distclean-compile \
+	distclean-generic distclean-tags distcleancheck distdir \
+	distuninstallcheck dvi dvi-am html html-am info info-am \
+	install install-am install-binPROGRAMS install-data \
 	install-data-am install-dvi install-dvi-am install-exec \
-	install-exec-am install-html install-html-am install-info \
-	install-info-am install-man install-pdf install-pdf-am \
-	install-ps install-ps-am install-strip installcheck \
-	installcheck-am installdirs installdirs-am maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-generic pdf \
-	pdf-am ps ps-am tags tags-am uninstall uninstall-am
+	install-exec-am install-html install-html-am \
+	install-includeHEADERS install-info install-info-am \
+	install-man install-pdf install-pdf-am install-ps \
+	install-ps-am install-strip installcheck installcheck-am \
+	installdirs maintainer-clean maintainer-clean-generic \
+	mostlyclean mostlyclean-compile mostlyclean-generic pdf pdf-am \
+	ps ps-am tags tags-am uninstall uninstall-am \
+	uninstall-binPROGRAMS uninstall-includeHEADERS
 
 .PRECIOUS: Makefile
 
+
+@BUILD_NSPIRE_TRUE@SUFFIXES: .tns .zehn .elf .c .o
+
+@BUILD_NSPIRE_TRUE@.elf.zehn:
+@BUILD_NSPIRE_TRUE@		$(GENZEHN) --input $< --output $@ $(ZEHNFLAGS)
+@BUILD_NSPIRE_TRUE@		rm $<
+@BUILD_NSPIRE_TRUE@.zehn.tns: 
+@BUILD_NSPIRE_TRUE@		make-prg $< $@
+@BUILD_NSPIRE_TRUE@		rm $<
+
+@BUILD_NSPIRE_TRUE@all-am: Makefile $(PROGRAMS:.elf=.tns) $(HEADERS)
+
+@BUILD_NSPIRE_TRUE@clean-local:
+@BUILD_NSPIRE_TRUE@	rm -f $(PROGRAMS:.elf=.tns)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

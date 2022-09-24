@@ -34,9 +34,9 @@ AM_CONDITIONAL([BUILD_LINUX], [test "$build_linux" = "yes"])
 AM_CONDITIONAL([BUILD_WIN32], [test "$build_windows" = "yes"])
 AM_CONDITIONAL([BUILD_NSPIRE], [test "$build_nspire" = "yes"])
 
-AC_CONFIG_FILES([Makefile src/Makefile])
+AC_CONFIG_FILES([Makefile])
 
-AC_CONFIG_SRCDIR([src/SortTest.c])
+AC_CONFIG_SRCDIR([SortTest.c])
 
 AC_CHECK_FUNCS([memset pow sqrt log])
 AC_PATH_X
