@@ -75,11 +75,6 @@ void Draw_Rect(struct Rect *rect, struct Color col)
     }
 }
 
-void Draw_Text(int x, int y, const char *text, size_t len, int size, struct Color col)
-{
-    // implement
-}
-
 void Draw_end()
 {
     Screen_set(screenbuff);

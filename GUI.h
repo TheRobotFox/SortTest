@@ -70,7 +70,7 @@ void GUI_Window_foreground_set(GUI_Window_id id, struct Color col);
 
 void GUI_Window_background_set(GUI_Window_id id, struct Color col);
 
-void GUI_Window_title_set(GUI_Window_id id, char *title);
+void GUI_Window_title_set(GUI_Window_id id, const char *title);
 
 const char* GUI_Window_title_get(GUI_Window_id id);
 void GUI_Window_do_render(GUI_Window_id id, int do_render);

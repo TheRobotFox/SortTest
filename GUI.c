@@ -203,7 +203,6 @@ void GUI_render(){
     }
 }
 
-
 int GUI_create(struct GUI_conf *conf)
 {
     current_state.conf=conf;
@@ -326,6 +325,31 @@ static bool f_win_by_id(void *_a, void *_b)
     return a->id==*b;
 }
 
+union U_GUI_Window_id_wrapper
+{
+    GUI_Window_id id;
+    void *ptr;
+};
+
+static void f_List_reserve_callback_marks(List l, enum E_CALLBACK_MSG msg, void *arg)
+{
+    union U_GUI_Window_id_wrapper wrapped_id = (union U_GUI_Window_id_wrapper)arg;
+    GUI_Window_id id = wrapped_id.id;
+    switch(msg)
+    {
+    case CM_PRE_REALLOC:
+        GUI_Window_do_render(id, 0);
+        break;
+
+    case CM_POST_REALLOC:
+        GUI_Window_do_render(id, 1);
+        break;
+
+    default:
+        break;
+    }
+}
+
 GUI_Window_id GUI_windows_append()
 {
     if(current_state.conf->active){
@@ -340,10 +364,15 @@ GUI_Window_id GUI_windows_append()
 
         struct GUI_Window *win = List_append(current_state.windows, NULL);
 
+        win->id=current_id++;
         win->l = List_create(sizeof(S_TYPE));
         win->marks = List_create(sizeof(struct GUI_Mark));
+
+        //set callback for realloc
+        union U_GUI_Window_id_wrapper wrapped_id = {win->id};
+        List_reserve_callback(win->marks, f_List_reserve_callback_marks, wrapped_id.ptr);
+
         win->opacity=1.0f;
-        win->id=current_id++;
         win->do_render = 1;
         win->rendering = 0;
         win->title=NULL;
@@ -407,11 +436,8 @@ void GUI_Window_marks_add(GUI_Window_id id, size_t index, struct Color col)
         if(win){
 
             struct GUI_Mark *mark = List_find(win->marks, f_mark_by_index, &index);
-            if(!mark){
-                GUI_Window_do_render(id, 0);
-                mark = List_append(win->marks, NULL);
-                GUI_Window_do_render(id, 1);
-            }
+            if(!mark)
+                mark = List_append(win->marks, NULL); // stops render in case of realloc
 
             mark->index = index;
             mark->col = col;
@@ -459,7 +485,7 @@ void GUI_Window_background_set(GUI_Window_id id, struct Color col)
     }
 }
 
-void GUI_Window_title_set(GUI_Window_id id, char *title)
+void GUI_Window_title_set(GUI_Window_id id, const char *title)
 {
     if(current_state.conf->active){
         struct GUI_Window *win = List_find(current_state.windows, f_win_by_id, &id);
@@ -487,7 +513,8 @@ void GUI_Window_do_render(GUI_Window_id id, int do_render)
         struct GUI_Window *win = List_find(current_state.windows, f_win_by_id, &id);
         if(win){
             win->do_render=do_render;
-            while(win->rendering) Sleep(5);
+            if(!do_render)
+                while(win->rendering) Sleep(5);
         }
     }
 }

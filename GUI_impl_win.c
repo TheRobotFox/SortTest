@@ -42,7 +42,7 @@ void Draw_Rect(struct Rect *rect, struct Color col)
     DeleteObject(brush);
 }
 
-void Draw_Text(int x, int y, const char *text, size_t len, int size, struct Color col)
+/*void Draw_Text(int x, int y, const char *text, size_t len, int size, struct Color col)
 {
     HFONT font = CreateFontA(size,0,0,0,0,0,0,0,DEFAULT_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,0);
     SelectObject(hdc,font);
@@ -51,7 +51,7 @@ void Draw_Text(int x, int y, const char *text, size_t len, int size, struct Colo
     RECT rc = {x,y,screen_rect.right,screen_rect.bottom};
     DrawTextA(hdc, text, len, &rc,0);
     DeleteObject(font);
-}
+}*/
 
 void Draw_end()
 {

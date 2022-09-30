@@ -7,6 +7,10 @@ struct _List{
 	size_t size;
 	size_t max;
 	size_t element_size;
+	float reserve_mult;
+	F_List_reserve_callback callback;
+	void *callback_arg;
+
 };
 
 List List_create(size_t element_size)
@@ -16,6 +20,9 @@ List List_create(size_t element_size)
 	l->data=malloc(l->element_size);
 	l->size=0;
 	l->max=1;
+	l->reserve_mult=2.0f;
+	l->callback=NULL;
+
 	return l->data ? l : NULL;
 }
 
@@ -46,13 +53,34 @@ void* List_end(List l){return l->data+(l->size*l->element_size);}
 size_t List_size(List l){return l->size;}
 size_t List_capacity(List l){return l->max;}
 
+void List_reserve_mult(List l, float mult) { l->reserve_mult=mult; }
+
+void List_reserve_callback(List l, F_List_reserve_callback callback, void *arg)
+{
+	l->callback=callback;
+	l->callback_arg=arg;
+}
+
 bool List_reserve(List l, size_t capacity)
 {
-	if(capacity>l->max)
-	{
+	if(capacity>l->max) {
+
+		if(l->callback)
+			l->callback(l, CM_PRE_REALLOC, l->callback_arg);
+
 		l->data=realloc(l->data,capacity*l->element_size);
 		l->max=capacity;
+
+		if(l->callback)
+			l->callback(l, CM_POST_REALLOC, l->callback_arg);
+
+	} else {
+
+		if(l->callback)
+			l->callback(l, CM_NO_REALLOC, l->callback_arg);
+
 	}
+
 	return !(l->data);
 }
 
@@ -77,7 +105,7 @@ void* List_append(List l, const void *element)
 {
 	if(l->size>=l->max)
 	{
-		if(List_reserve(l, l->max*2))
+		if(List_reserve(l, l->max*l->reserve_mult))
 			return 0;
 	}
 	void *ptr=List_at(l,l->size);

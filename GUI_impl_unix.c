@@ -53,7 +53,7 @@ void Draw_Rect(struct Rect *rect, struct Color col)
     XFreeGC(d,color);
 }
 
-void Draw_Text(int x, int y, const char *text, size_t len, int size, struct Color col)
+/*void Draw_Text(int x, int y, const char *text, size_t len, int size, struct Color col)
 {
     XGCValues v;
     v.foreground=RGB(col.r, col.g, col.b);
@@ -61,7 +61,7 @@ void Draw_Text(int x, int y, const char *text, size_t len, int size, struct Colo
     XDrawString(d, buffer, color, x, y, text, len);
     //printf("Text : %s | %d at %d,%d\n", text, len, x, y);
     XFreeGC(d,color);
-}
+}*/
 
 void Draw_end()
 {
