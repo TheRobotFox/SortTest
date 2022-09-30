@@ -1,6 +1,3 @@
-[submodule "List"]
-	path = List
-	url = https://github.com/NoHamster/List
 [submodule "NoFont"]
 	path = NoFont
 	url = https://github.com/NoHamster/NoFont
