@@ -59,8 +59,6 @@ List Test(List SortList, SortAlg *Alg, int iterations){
         if(List_verify(l))
             printf("ERROR!\n%s misperformed on %d\n",Alg->name, iter);
 
-        GUI_update(1);
-
         Sleep_while_active(1000);
 
     }

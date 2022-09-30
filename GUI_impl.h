@@ -27,7 +27,7 @@ void handleInput(enum INPUT e);
 // 2. pass input to handleInput
 struct Rect get_screen_dimensions();
 void Draw_Rect(struct Rect *rect, struct Color col);
-void Draw_Text(int x, int y, const char *text, size_t len, int size, struct Color col);
+//void Draw_Text(int x, int y, const char *text, size_t len, int size, struct Color col);
 void Draw_end();
 void Draw_begin();
 void Sleep_while_active(size_t ms);

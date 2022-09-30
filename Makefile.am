@@ -1,10 +1,20 @@
 bin_PROGRAMS = SortTest
-SortTest_SOURCES =  argparse.c csv.c Sort.c SortList.c SortTest.c GUI.c GUI_impl_win.c GUI_impl_unix.c GUI_impl_ti.c List/List.c
-include_HEADERS = argparse.h SortList.h GUI.h csv.h Sort.h SortTest.h List/List.h GUI_impl.h
+SortTest_SOURCES = argparse.c csv.c Sort.c SortList.c SortTest.c GUI.c GUI_impl_win.c GUI_impl_unix.c GUI_impl_ti.c NoFont/Font_Driver.c List/List.c 
+SortTest_DEPENDENCIES = Font.font.c 
+include_HEADERS = argparse.h SortList.h GUI.h csv.h Sort.h SortTest.h List/List.h GUI_impl.h NoFont/Font_Driver.h
+
+_EXTRA_CLEANUP=Font.font.c 
+
+if BUILD_WIN32
+PY=python
+else
+PY=python3
+endif
+
 
 if BUILD_NSPIRE
-
-SortTest_CFLAGS=-Ofast -funsafe-math-optimizations
+_EXTRA_CLEANUP+= $(PROGRAMS:.elf=.tns)
+SortTest_CFLAGS=-Ofast -funsafe-math-optimizations -Wall
 else
 SortTest_CFLAGS=-Ofast -mavx2 -Wall -m64 -s -funsafe-math-optimizations
 SortTest_CFLAGS_x=-g -fsanitize=address
@@ -40,7 +50,15 @@ EXE=$(top_builddir)/bin/SortTest
 
 all-am: Makefile $(PROGRAMS:.elf=.tns) $(HEADERS)
 
-clean-local:
-	rm -f $(PROGRAMS:.elf=.tns)
-
 endif
+
+
+GUI.c: Font.font.c
+Font.font.c: Font.bmp
+	$(PY) $(top_srcdir)/NoFont/img2font.py $< "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890()[]{}!?\"=/\'+-*#.,_" true
+
+clean-local: clean-local-extra
+
+.PHONY: clean-local-extra
+clean-local-extra:
+	rm -f $(_EXTRA_CLEANUP)

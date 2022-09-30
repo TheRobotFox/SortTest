@@ -84,7 +84,7 @@ int List_verify(List l)
 {
 
     const char *title_backup = GUI_Window_title_get(0);
-    GUI_Window_title_set(0, "Verify");
+    GUI_Window_title_set(0, "VERIFY");
     GUI_Window_marks_clear(0);
     S_TYPE *start = List_start(l),
            *end = List_end(l)-1;
@@ -101,6 +101,8 @@ int List_verify(List l)
         GUI_wait();
         GUI_update(0);
     }
+    GUI_update(1);
+
     GUI_Window_title_set(0, title_backup);
     return 0;
 }

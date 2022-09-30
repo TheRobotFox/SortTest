@@ -1,4 +1,5 @@
 #include "GUI_impl.h"
+#include "Font.font.h"
 
 struct GUI_Mark
 {
@@ -11,8 +12,10 @@ struct GUI_Window
     GUI_Window_id id;
     List l;
     List marks;
+
     const char *title;
     size_t title_len;
+
     struct Rect rect;
     float opacity;
     struct Color foreground;
@@ -58,8 +61,19 @@ static bool f_mark_by_index(void *_a, void *_b)
     return a->index==*b;
 }
 
-static void GUI_Window_render(struct GUI_Window *win){
+static int f_Draw_Rect(Font_Rect *rect, void *col)
+{
+    struct Rect rc = {rect->x, rect->y, rect->x+rect->width, rect->y+rect->height};
+    Draw_Rect(&rc, *(struct Color*)col);
+    return 0;
+}
+static void Draw_Text(int x, int y, const char *text, size_t len, int size, struct Color col)
+{
+    Font_render_string_rect(&font, text, len, x, y, size, f_Draw_Rect, &col);
+}
 
+static void GUI_Window_render(struct GUI_Window *win)
+{
     struct Rect rect = win->rect,
                 line;
     struct Color col;
@@ -106,7 +120,8 @@ static void GUI_Window_render(struct GUI_Window *win){
         if(win->title){
             unsigned char color = 255*(1-round((float)(win->background.r+win->background.g+win->background.b)/255.0f/3.0f));
             int size=(win->rect.bottom-win->rect.top)/15;
-            Draw_Text(win->rect.left+1, win->rect.top+1, win->title, win->title_len, size, (struct Color){color,color,color});
+            Font_Rect title_size = Font_string_dimensions(&font, win->title, win->title_len, size);
+            Draw_Text(win->rect.right-title_size.width-1, win->rect.top+1, win->title, win->title_len, size, (struct Color){color,color,color});
         }
 
     }
@@ -176,7 +191,7 @@ void GUI_render(){
         if(current_state.conf->Alg){
             struct Rect rect = get_screen_dimensions();
             int length=snprintf(buff,255,"%-20s - %.3fs",current_state.conf->Alg->name,current_state.conf->Alg->time/CLOCKS_PER_SEC);
-            Draw_Text(0, 32, buff, length, rect.bottom/15, (struct Color){255,255,255});
+            Draw_Text(1, (rect.bottom/10-rect.bottom/15)/2, buff, length, rect.bottom/15, (struct Color){255,255,255});
 
             // Print Pause
             if(current_state.paused){
@@ -393,7 +408,9 @@ void GUI_Window_marks_add(GUI_Window_id id, size_t index, struct Color col)
 
             struct GUI_Mark *mark = List_find(win->marks, f_mark_by_index, &index);
             if(!mark){
+                GUI_Window_do_render(id, 0);
                 mark = List_append(win->marks, NULL);
+                GUI_Window_do_render(id, 1);
             }
 
             mark->index = index;
@@ -442,7 +459,7 @@ void GUI_Window_background_set(GUI_Window_id id, struct Color col)
     }
 }
 
-void GUI_Window_title_set(GUI_Window_id id, const char *title)
+void GUI_Window_title_set(GUI_Window_id id, char *title)
 {
     if(current_state.conf->active){
         struct GUI_Window *win = List_find(current_state.windows, f_win_by_id, &id);
