@@ -16,8 +16,8 @@ if BUILD_NSPIRE
 _EXTRA_CLEANUP+= $(PROGRAMS:.elf=.tns)
 SortTest_CFLAGS=-Ofast -funsafe-math-optimizations -Wall
 else
-SortTest_CFLAGS_x=-Ofast -mavx2 -Wall -m64 -s -funsafe-math-optimizations
-SortTest_CFLAGS=-g -fsanitize=address
+SortTest_CFLAGS=-Ofast -mavx2 -Wall -m64 -s -funsafe-math-optimizations
+SortTest_CFLAGS_x=-g -fsanitize=address
 endif
 
 if BUILD_LINUX

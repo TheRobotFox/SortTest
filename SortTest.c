@@ -231,8 +231,7 @@ int main(int argc, char** argv){
         }
 
         printf(OUT_FORMAT,Conf.SortAlgs[i].name,Conf.SortAlgs[i].time/CLOCKS_PER_SEC,Conf.SortAlgs[i].swap,Conf.SortAlgs[i].comp);
-        if(List_size(l)>0)
-            List_free(l);
+        List_free(l);
     }
 end:
     if(gui_conf.activate)

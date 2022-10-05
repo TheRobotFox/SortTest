@@ -36,20 +36,20 @@ struct Rect get_screen_dimensions()
 void Draw_begin()
 {
     if(current_state.conf->active){
-	    // get current window size
-	XGetWindowAttributes(d,w,&attr);
-	rect.right=attr.width;
-	rect.bottom=attr.height;
-	    buffer = XCreatePixmap(d,w,rect.right,rect.bottom, 24);
+      // get current window size
+      XGetWindowAttributes(d,w,&attr);
+      rect.right=attr.width;
+      rect.bottom=attr.height;
+      buffer = XCreatePixmap(d,w,rect.right,rect.bottom, 24);
 
-	    Draw_Rect(&rect, (struct Color){0,0,0});
-	    XSetForeground(d, gc, 0);
+      Draw_Rect(&rect, (struct Color){0,0,0});
+      XSetForeground(d, gc, 0);
     }
 }
 
 void Draw_Rect(struct Rect *rect, struct Color col)
 {
-    if(current_state.conf->active){
+    if(buffer){
     XGCValues v;
     v.foreground=RGB(col.r, col.g, col.b);
     GC color = XCreateGC(d,buffer,GCForeground,&v);
@@ -72,6 +72,7 @@ void Draw_end()
 {
     XCopyArea(d, buffer, w, gc, 0,0, rect.right, rect.bottom, 0, 0);
     XFreePixmap(d, buffer);
+    buffer=0;
 
 }
 
@@ -85,7 +86,7 @@ static void* GUI_thread_proc(void *unused){
 
 	XMapWindow(d,w);
 
-    current_state.conf->active=1;
+  current_state.conf->active=1;
 
 	while(current_state.conf->active){
 	//	while(XNextEvent(d, &e)){

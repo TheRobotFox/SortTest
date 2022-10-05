@@ -317,6 +317,8 @@ void _ReculinSort(List l, int iter)
         }
 
 
+        GUI_Window_do_render(u, 0);
+        GUI_Window_do_render(o, 0);
         //printf("%d | %d\n", urlaub.filled, output.filled);
         if(!List_size(urlaub)){
 

@@ -223,12 +223,12 @@ void GUI_destroy()
     current_state.conf->do_render = 0;
     while(current_state.rendering) Sleep(5);
 
-    current_state.conf->active=0;
-
     for(struct GUI_Window *start = List_start(current_state.windows),
                           *end = List_end(current_state.windows);
                           start < end; start++)
         GUI_windows_remove(start->id);
+
+    current_state.conf->active=0;
 
     List_free(current_state.windows);
 
@@ -331,7 +331,7 @@ union U_GUI_Window_id_wrapper
     void *ptr;
 };
 
-static void f_List_reserve_callback_marks(List l, enum E_CALLBACK_MSG msg, void *arg)
+static void f_List_reserve_callback_stop_render(List l, enum E_CALLBACK_MSG msg, void *arg)
 {
     union U_GUI_Window_id_wrapper wrapped_id = (union U_GUI_Window_id_wrapper)arg;
     GUI_Window_id id = wrapped_id.id;
@@ -365,12 +365,11 @@ GUI_Window_id GUI_windows_append()
         struct GUI_Window *win = List_append(current_state.windows, NULL);
 
         win->id=current_id++;
-        win->l = List_create(sizeof(S_TYPE));
         win->marks = List_create(sizeof(struct GUI_Mark));
 
         //set callback for realloc
         union U_GUI_Window_id_wrapper wrapped_id = {win->id};
-        List_reserve_callback(win->marks, f_List_reserve_callback_marks, wrapped_id.ptr);
+        List_reserve_callback(win->marks, f_List_reserve_callback_stop_render, wrapped_id.ptr);
 
         win->opacity=1.0f;
         win->do_render = 1;
@@ -422,6 +421,9 @@ void GUI_Window_set_list(GUI_Window_id id, List l)
             win->do_render = 0;
             while(win->rendering) Sleep(5);
             win->l = l;
+            //set callback for realloc
+            union U_GUI_Window_id_wrapper wrapped_id = {id};
+            List_reserve_callback(win->l, f_List_reserve_callback_stop_render, wrapped_id.ptr);
             List_clear(win->marks);
             win->do_render = tmp;
         }
