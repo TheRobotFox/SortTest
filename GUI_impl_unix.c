@@ -35,22 +35,27 @@ struct Rect get_screen_dimensions()
 
 void Draw_begin()
 {
-    // get current window size
-    XGetWindowAttributes(d,w,&attr);
-   	rect.right=attr.width;
-   	rect.bottom=attr.height;
+    if(current_state.conf->active){
+	    // get current window size
+	XGetWindowAttributes(d,w,&attr);
+	rect.right=attr.width;
+	rect.bottom=attr.height;
+	    buffer = XCreatePixmap(d,w,rect.right,rect.bottom, 24);
 
-    Draw_Rect(&rect, (struct Color){0,0,0});
-    XSetForeground(d, gc, 0);
+	    Draw_Rect(&rect, (struct Color){0,0,0});
+	    XSetForeground(d, gc, 0);
+    }
 }
 
 void Draw_Rect(struct Rect *rect, struct Color col)
 {
+    if(current_state.conf->active){
     XGCValues v;
     v.foreground=RGB(col.r, col.g, col.b);
     GC color = XCreateGC(d,buffer,GCForeground,&v);
     XFillRectangle(d,buffer,color,rect->left,rect->top,rect->right-rect->left,rect->bottom-rect->top);
     XFreeGC(d,color);
+    }
 }
 
 /*void Draw_Text(int x, int y, const char *text, size_t len, int size, struct Color col)
@@ -66,16 +71,17 @@ void Draw_Rect(struct Rect *rect, struct Color col)
 void Draw_end()
 {
     XCopyArea(d, buffer, w, gc, 0,0, rect.right, rect.bottom, 0, 0);
+    XFreePixmap(d, buffer);
+
 }
 
 static void* GUI_thread_proc(void *unused){
 
 	d=XOpenDisplay(NULL);
 	s=DefaultScreen(d);
-    buffer = XCreatePixmap(d,w,rect.right,rect.bottom, 24);
-    gc = XCreateGC(d,w,0, NULL);
 	w=XCreateSimpleWindow(d, RootWindow(d,s), 10,10,100,100,1, BlackPixel(d,s), BlackPixel(d,s));
 	XSelectInput(d,w, KeyPressMask | ExposureMask);
+    gc = XCreateGC(d,w,0, NULL);
 
 	XMapWindow(d,w);
 
@@ -107,7 +113,6 @@ int GUI_impl_destroy()
 {
     pthread_join(Thread, NULL);
     XDestroyWindow(d, w);
-    XFreePixmap(d, buffer);
     XFreeGC(d, gc);
     XCloseDisplay(d);
 
