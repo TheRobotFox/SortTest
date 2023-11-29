@@ -16,8 +16,8 @@
 #elif defined(__unix__)
 
 #include <unistd.h>
-#define Sleep(x) usleep(x*1000)
 
+void Sleep(size_t ms);
 
 #elif defined(_WIN32)
 #include <windows.h>

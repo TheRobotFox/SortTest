@@ -17,6 +17,7 @@ void Sleep_while_active(size_t ms)
 }
 
 // IO functions
+#ifndef CONSCREEN
 struct Rect get_screen_dimensions()
 {
     RECT rc;
@@ -195,4 +196,5 @@ void GUI_impl_update()
     //PostMessageA(hwnd,WM_PAINT,0,0);
 }
 
+#endif
 #endif

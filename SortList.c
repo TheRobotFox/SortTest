@@ -27,21 +27,21 @@ void List_random_fill(List l, int n){
     for(int i=0; i<n; i++)
     {
         num = (int)((float)rand()/RAND_MAX*(n*10));
-        List_append(l, &num);
+        LIST_push(int)(l, num);
     }
 }
 
 void List_fill_reversed(List l, int n){
     for(int i=n-1; i>=0; i--)
     {
-        List_append(l, &i);
+        LIST_push(int)(l, i);
     }
 }
 
 void List_fill_to_n(List l, int n){
     for(int i=0; i<n; i++)
     {
-        List_append(l, &i);
+        LIST_push(int)(l, i);
     }
 }
 
@@ -56,7 +56,7 @@ int List_append_csv(List l, CSV  csv)
         if(res){
             return -1;
         }
-        List_append(l, &num);
+        LIST_push(int)(l, num);
     }
     return 0;
 }
@@ -74,7 +74,7 @@ void List_save(List l, FILE *f)
         if((i%line_length)==0)
             fputc('\n', f);
 
-        fprintf(f,tmp_file_buf,*(S_TYPE*)List_get(l,i));
+        fprintf(f,tmp_file_buf,LIST_get(S_TYPE)(l,i));
     }
     fseek(f,-1,SEEK_CUR);
     fputc('\n',f);

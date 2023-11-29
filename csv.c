@@ -1,4 +1,5 @@
 #include "csv.h"
+#include "SortList.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -45,6 +46,7 @@ CSV CSV_load_string_del(char *str,int size,char sep)
     str[size]=0;
     return csv;
 }
+
 
 void CSV_print(CSV CSV){
     for(int i=0; i< CSV.size; i++)

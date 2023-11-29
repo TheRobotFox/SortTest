@@ -43,7 +43,7 @@ void Sleep(size_t ms)
                     current_state.conf->active=0;
 }
 
-
+#ifndef CONSCREEN
 void Screen_clear(void* buff){
     memset(buff,0,SCREEN_X*SCREEN_Y*sizeof(short));
 }
@@ -95,4 +95,5 @@ void GUI_impl_update()
     GUI_render();
 }
 
+#endif
 #endif

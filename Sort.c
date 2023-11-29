@@ -1,4 +1,6 @@
 #include "Sort.h"
+#include "List/List.h"
+#include "SortTest.h"
 
 static size_t comp;
 static size_t swap;
@@ -20,18 +22,10 @@ size_t getSwap()
 
 static void Swap(List l, size_t a, size_t b)
 {
-	//if(a<0 || a>=List_size(l) || b<0 || b<List->size){
-		//printf("OOB Swap!");
-		//raise(SIGINT);
-	//}
 
     swap++;
+    List_swap(l, a, b);
 
-    S_TYPE tmp;
-    tmp=*(S_TYPE*)List_get(l, a);
-    *(S_TYPE*)List_get(l,a)=*(S_TYPE*)List_get(l, b);
-
-    *(S_TYPE*)List_get(l, b)=tmp;
     GUI_update(0);
     GUI_wait();
 }
@@ -52,7 +46,7 @@ static int Compare(List l, size_t a, size_t b)
         GUI_Window_marks_add(0, b, (struct Color){0,255,0});
         a_last=a;
         b_last=b;
-        return *(S_TYPE*)List_get(l, a)>*(S_TYPE*)List_get(l, b);
+        return LIST_get(S_TYPE)(l, a)>LIST_get(S_TYPE)(l, b);
     }
     return a>b;
 }
@@ -108,7 +102,7 @@ void StalinSort(List l)
     for(int i=0; i<List_size(l)-1;i++){
         while(i<List_size(l)-1){
             if(Compare(l,i,i+1)){
-                List_remove(l, i+1);
+                List_rmi(l, i+1);
                 continue;
             }
             break;
@@ -141,10 +135,11 @@ void LSD_Radix(List l)
     int Counts[RADIX],
         size = List_size(l),
         *data;
-    List l2 = List_create(sizeof(S_TYPE)),
+    List l2 = LIST_create(S_TYPE),
          *input=&l,
          *output=&l2;
-    List_grow(l2, size);
+
+    List_resize(l2, size);
 
 
     // backup main window title
@@ -169,13 +164,13 @@ void LSD_Radix(List l)
         int shift=(level*(int)log2(RADIX));
         ClearArray(Counts);
         for(int i=0; i<List_size(*input);i++){
-            Counts[(*(S_TYPE*)List_get(*input, i)>>shift)&(RADIX-1)]++;
+            Counts[(LIST_get(S_TYPE)(*input, i)>>shift)&(RADIX-1)]++;
         }
         for(int i=1; i<RADIX; i++){
             Counts[i]+=Counts[i-1];
         }
         for(int i=List_size(*input)-1; i>=0; i--){
-            *(S_TYPE*)List_get(*output,--Counts[(*(S_TYPE*)List_get(*input, i)>>shift)&(RADIX-1)]) = *(S_TYPE*)List_get(*input, i);
+            LIST_get(S_TYPE)(*output,--Counts[(LIST_get(S_TYPE)(*input, i)>>shift)&(RADIX-1)]) = LIST_get(S_TYPE)(*input, i);
             GUI_wait();
             GUI_update(0);
         }
@@ -203,21 +198,21 @@ void InsertionSort(List l)
     int j, p1=-1, p2=-1;
     S_TYPE tmp;
     for(int i=1; i<List_size(l);i++){
-        tmp=*(S_TYPE*)List_get(l, i);
+        tmp=LIST_get(S_TYPE)(l, i);
         if(p1!=-1)
             GUI_Window_marks_remove(0, p1);
         GUI_Window_marks_add(0, i, (struct Color){255,0,0});
         p1=i;
         j=i-1;
-        while(j >=0 && Compare(NULL,*(S_TYPE*)List_get(l, j),tmp)){
+        while(j >=0 && Compare(NULL,LIST_get(S_TYPE)(l, j),tmp)){
             if(p2!=-1)
                 GUI_Window_marks_remove(0, p2);
         GUI_Window_marks_add(0, j, (struct Color){0,255,0});
             p2=j;
-            *(S_TYPE*)List_get(l, j+1)=*(S_TYPE*)List_get(l, j);
+            LIST_get(S_TYPE)(l, j+1)=LIST_get(S_TYPE)(l, j);
             j--;
         }
-        *(S_TYPE*)List_get(l, j+1)=tmp;
+        LIST_get(S_TYPE)(l, j+1)=tmp;
     }
 
 }
@@ -296,24 +291,24 @@ void _ReculinSort(List l, int iter)
         {
             int largest = 0,
                 i;
-            List_append(output, List_get(l, 0));
+            List_push(output, List_at(l, 0));
             GUI_Window_marks_add(0, 0, (struct Color){0,255,0});
 
             for(i=1; i<List_size(l)-iter; i++)
             {
-                if(*(S_TYPE*)List_get(l, i)>*(S_TYPE*)List_get(l, largest)){
-                    List_append(output, List_get(l, i));
+                if(LIST_get(S_TYPE)(l, i)>LIST_get(S_TYPE)(l, largest)){
+                    List_push(output, List_at(l, i));
                     GUI_Window_marks_add(0, i, (struct Color){0,255,0});
                     largest=i;
                 }else{
-                    List_append(urlaub, List_get(l, i));
+                    List_push(urlaub, List_at(l, i));
                     GUI_Window_marks_add(0, i, (struct Color){255,0,0});
                 }
                 GUI_wait();
                 GUI_update(0);
             }
             for(; i<List_size(l); i++)
-                    List_append(output, List_get(l, i));
+                    List_push(output, List_at(l, i));
         }
 
 

@@ -3,6 +3,7 @@
 #include "csv.h"
 #include "GUI.h"
 #include <math.h>
+#include <stdio.h>
 
 
 typedef struct{
@@ -191,7 +192,6 @@ int main(int argc, char** argv){
     }
 
     DBGP;
-
 
     gui_conf.activate = gui_conf.delay>0;
     gui_conf.do_render=1;

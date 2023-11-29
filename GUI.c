@@ -107,7 +107,7 @@ static void GUI_Window_render(struct GUI_Window *win)
             }
 
             // Create Rect and color pointers
-            struct GUI_Mark *mark = List_find(win->marks, f_mark_by_index, &index);
+            struct GUI_Mark *mark = List_finde(win->marks, f_mark_by_index, &index);
             if(mark)
                 col=mark->col;
             else
@@ -209,7 +209,7 @@ int GUI_create(struct GUI_conf *conf)
     if(!conf->activate)
         return 0;
 
-    current_state.windows = List_create(sizeof(struct GUI_Window));
+    current_state.windows = LIST_create(struct GUI_Window);
     current_state.rendering=0;
     current_state.paused=0;
 
@@ -331,7 +331,7 @@ union U_GUI_Window_id_wrapper
     void *ptr;
 };
 
-static void f_List_reserve_callback_stop_render(List l, enum E_CALLBACK_MSG msg, void *arg)
+static void f_List_realloc_callback_stop_render(List l, enum E_CALLBACK_MSG msg, void *arg)
 {
     union U_GUI_Window_id_wrapper wrapped_id = (union U_GUI_Window_id_wrapper)arg;
     GUI_Window_id id = wrapped_id.id;
@@ -362,14 +362,14 @@ GUI_Window_id GUI_windows_append()
         current_state.conf->do_render = 0;
         while(current_state.rendering) Sleep(5);
 
-        struct GUI_Window *win = List_append(current_state.windows, NULL);
+        struct GUI_Window *win = List_push(current_state.windows, NULL);
 
         win->id=current_id++;
         win->marks = List_create(sizeof(struct GUI_Mark));
 
         //set callback for realloc
         union U_GUI_Window_id_wrapper wrapped_id = {win->id};
-        List_reserve_callback(win->marks, f_List_reserve_callback_stop_render, wrapped_id.ptr);
+        List_realloc_callback(win->marks, f_List_realloc_callback_stop_render, wrapped_id.ptr);
 
         win->opacity=1.0f;
         win->do_render = 1;
@@ -397,12 +397,12 @@ GUI_Window_id GUI_windows_append()
 void GUI_windows_remove(GUI_Window_id id)
 {
     if(current_state.conf->active){
-        struct GUI_Window *win = List_find(current_state.windows, f_win_by_id, &id);
+        struct GUI_Window *win = List_finde(current_state.windows, f_win_by_id, &id);
         if(win){
             current_state.conf->do_render = 0;
             while(current_state.rendering) Sleep(5);
             List_free(win->marks);
-            List_remove(current_state.windows, win-(struct GUI_Window*)List_start(current_state.windows));
+            List_rmi(current_state.windows, win-LIST_start(struct GUI_Window)(current_state.windows));
             current_state.conf->do_render = 1;
         }
     }
@@ -414,7 +414,7 @@ void GUI_Window_set_list(GUI_Window_id id, List l)
 {
     if(current_state.conf->active){
 
-        struct GUI_Window *win = List_find(current_state.windows, f_win_by_id, &id);
+        struct GUI_Window *win = List_finde(current_state.windows, f_win_by_id, &id);
         if(win){
 
             int tmp = win->do_render;
@@ -423,7 +423,7 @@ void GUI_Window_set_list(GUI_Window_id id, List l)
             win->l = l;
             //set callback for realloc
             union U_GUI_Window_id_wrapper wrapped_id = {id};
-            List_reserve_callback(win->l, f_List_reserve_callback_stop_render, wrapped_id.ptr);
+            List_realloc_callback(win->l, f_List_realloc_callback_stop_render, wrapped_id.ptr);
             List_clear(win->marks);
             win->do_render = tmp;
         }
@@ -434,12 +434,12 @@ void GUI_Window_set_list(GUI_Window_id id, List l)
 void GUI_Window_marks_add(GUI_Window_id id, size_t index, struct Color col)
 {
     if(current_state.conf->active){
-        struct GUI_Window *win = List_find(current_state.windows, f_win_by_id, &id);
+        struct GUI_Window *win = List_finde(current_state.windows, f_win_by_id, &id);
         if(win){
 
-            struct GUI_Mark *mark = List_find(win->marks, f_mark_by_index, &index);
+            struct GUI_Mark *mark = List_finde(win->marks, f_mark_by_index, &index);
             if(!mark)
-                mark = List_append(win->marks, NULL); // stops render in case of realloc
+                mark = List_push(win->marks, NULL); // stops render in case of realloc
 
             mark->index = index;
             mark->col = col;
@@ -451,11 +451,11 @@ void GUI_Window_marks_add(GUI_Window_id id, size_t index, struct Color col)
 void GUI_Window_marks_remove(GUI_Window_id id, size_t index)
 {
     if(current_state.conf->active){
-        struct GUI_Window *win = List_find(current_state.windows, f_win_by_id, &id);
+        struct GUI_Window *win = List_finde(current_state.windows, f_win_by_id, &id);
         if(win){
-            struct GUI_Mark *mark = List_find(win->marks, f_mark_by_index, &index);
+            struct GUI_Mark *mark = List_finde(win->marks, f_mark_by_index, &index);
             if(mark)
-                List_remove(win->marks, mark-(struct GUI_Mark*)List_start(win->marks));
+                List_rmi(win->marks, mark-LIST_start(struct GUI_Mark)(win->marks));
         }
     }
 }
@@ -463,7 +463,7 @@ void GUI_Window_marks_remove(GUI_Window_id id, size_t index)
 void GUI_Window_marks_clear(GUI_Window_id id)
 {
     if(current_state.conf->active){
-        struct GUI_Window *win = List_find(current_state.windows, f_win_by_id, &id);
+        struct GUI_Window *win = List_finde(current_state.windows, f_win_by_id, &id);
         if(win)
             List_clear(win->marks);
     }
@@ -472,7 +472,7 @@ void GUI_Window_marks_clear(GUI_Window_id id)
 void GUI_Window_foreground_set(GUI_Window_id id, struct Color col)
 {
     if(current_state.conf->active){
-        struct GUI_Window *win = List_find(current_state.windows, f_win_by_id, &id);
+        struct GUI_Window *win = List_finde(current_state.windows, f_win_by_id, &id);
         if(win)
             win->foreground=col;
     }
@@ -481,7 +481,7 @@ void GUI_Window_foreground_set(GUI_Window_id id, struct Color col)
 void GUI_Window_background_set(GUI_Window_id id, struct Color col)
 {
     if(current_state.conf->active){
-        struct GUI_Window *win = List_find(current_state.windows, f_win_by_id, &id);
+        struct GUI_Window *win = List_finde(current_state.windows, f_win_by_id, &id);
         if(win)
             win->background=col;
     }
@@ -490,7 +490,7 @@ void GUI_Window_background_set(GUI_Window_id id, struct Color col)
 void GUI_Window_title_set(GUI_Window_id id, const char *title)
 {
     if(current_state.conf->active){
-        struct GUI_Window *win = List_find(current_state.windows, f_win_by_id, &id);
+        struct GUI_Window *win = List_finde(current_state.windows, f_win_by_id, &id);
         if(win){
             win->title=title;
             if(title)
@@ -502,7 +502,7 @@ void GUI_Window_title_set(GUI_Window_id id, const char *title)
 const char* GUI_Window_title_get(GUI_Window_id id)
 {
     if(current_state.conf->active){
-        struct GUI_Window *win = List_find(current_state.windows, f_win_by_id, &id);
+        struct GUI_Window *win = List_finde(current_state.windows, f_win_by_id, &id);
         if(win)
             return win->title;
     }
@@ -512,7 +512,7 @@ const char* GUI_Window_title_get(GUI_Window_id id)
 void GUI_Window_do_render(GUI_Window_id id, int do_render)
 {
     if(current_state.conf->active){
-        struct GUI_Window *win = List_find(current_state.windows, f_win_by_id, &id);
+        struct GUI_Window *win = List_finde(current_state.windows, f_win_by_id, &id);
         if(win){
             win->do_render=do_render;
             if(!do_render)

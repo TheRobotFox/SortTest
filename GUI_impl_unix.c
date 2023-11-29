@@ -6,6 +6,31 @@
 #include <X11/XKBlib.h>
 #include <X11/keysymdef.h>
 
+
+void Sleep(size_t ms){
+#if _POSIX_C_SOURCE >= 199309L
+    struct timespec ts;
+    ts.tv_sec = ms / 1000;
+    ts.tv_nsec = (ms % 1000) * 1000000;
+    nanosleep(&ts, NULL);
+#else
+    if (ms >= 1000)
+      sleep(ms / 1000);
+    usleep((ms % 1000) * 1000);
+#endif
+}
+
+
+void Sleep_while_active(size_t ms)
+{
+    size_t iter = ms/SLEEP_RES;
+    for(int i=0; current_state.conf->active && i<iter; i++){
+        Sleep(SLEEP_RES);
+    }
+}
+
+#ifndef CONSCREEN
+
 static pthread_t Thread;
 static Display *d;
 static Window w;
@@ -18,13 +43,6 @@ static struct Rect rect;
 
 #define RGB(r, g, b) (unsigned long)(r<<16 | g<<8 | b)
 
-void Sleep_while_active(size_t ms)
-{
-    size_t iter = ms/SLEEP_RES;
-    for(int i=0; current_state.conf->active && i<iter; i++){
-        Sleep(SLEEP_RES);
-    }
-}
 
 // IO functions
 
@@ -127,4 +145,5 @@ void GUI_impl_update()
     //XSendEvent(d,w,0,ExposureMask,&e);
 }
 
+#endif
 #endif
