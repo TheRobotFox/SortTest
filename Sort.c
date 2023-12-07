@@ -258,7 +258,7 @@ void QuickSort(int left, int right, List l)
 {
     if(left<right){
         unsigned int pivot = right;
-        int i=left,j=right-1;
+        int i=left, j=right-1;
         while(i<j){
             for(;i<right && Compare(l,pivot,i);i++);
             for(;j>left && !Compare(l,pivot,j);j--);
