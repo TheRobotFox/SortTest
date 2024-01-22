@@ -1,6 +1,7 @@
 #include "Sort.h"
 #include "List/List.h"
 #include "SortTest.h"
+#include <stdio.h>
 
 static size_t comp;
 static size_t swap;
@@ -275,6 +276,10 @@ void QuickSort(int left, int right, List l)
 void QuickSort_launcher(List l)
 {
     QuickSort(0,List_size(l)-1,l);
+}
+
+void MergeSort(List a, List b) {
+
 }
 
 static GUI_Window_id u, o;

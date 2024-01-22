@@ -203,10 +203,6 @@ case $1 in
 		# Convert single-component short-hands not valid as part of
 		# multi-component configurations.
 		case $field1 in
-			nspire)
-				basic_machine=nspire
-				basic_os=nspire
-				;;
 			386bsd)
 				basic_machine=i386-pc
 				basic_os=bsd
@@ -663,9 +659,6 @@ esac
 case $basic_machine in
 	# Here we handle the default manufacturer of certain CPU types.  It is in
 	# some cases the only manufacturer, in others, it is the most popular.
-	nspire)
-		cpu=nspire
-		;;
 	w89k)
 		cpu=hppa1.1
 		vendor=winbond
@@ -1180,7 +1173,7 @@ case $cpu-$vendor in
 		# Recognize the canonical CPU types that are allowed with any
 		# company name.
 		case $cpu in
-			nspire | 1750a | 580 \
+			1750a | 580 \
 			| a29k \
 			| aarch64 | aarch64_be \
 			| abacus \
@@ -1713,8 +1706,6 @@ fi
 
 # Now, validate our (potentially fixed-up) OS.
 case $os in
-	nspire)
-		;;
 	# Sometimes we do "kernel-libc", so those need to count as OSes.
 	musl* | newlib* | relibc* | uclibc*)
 		;;
