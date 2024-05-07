@@ -1,3 +1,4 @@
+#ifdef CONSCREEN
 #include "Conscreen/Conscreen_console.h"
 #include "Conscreen/Conscreen_screen.h"
 #include "GUI_impl.h"
@@ -51,4 +52,7 @@ int GUI_impl_destroy()
 void GUI_impl_update()
 {
     GUI_render();
+
+    // pass input to Sorttest
 }
+#endif
