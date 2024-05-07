@@ -1,6 +1,8 @@
 #include "SortList.h"
 #include "GUI.h"
 
+IMPLEMENT_LIST(int)
+
 void List_fill_random(List l, int n)
 {
     S_TYPE *data,
