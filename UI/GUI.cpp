@@ -1,30 +1,6 @@
 #include "GUI_impl.h"
 #include "Font.font.h"
 
-struct GUI_Mark
-{
-    size_t index;
-    struct Color col;
-};
-
-struct GUI_Window
-{
-    GUI_Window_id id;
-    List l;
-    List marks;
-
-    const char *title;
-    size_t title_len;
-
-    struct Rect rect;
-    float opacity;
-    struct Color foreground;
-    struct Color background;
-
-    int do_render;
-    int rendering;
-};
-
 struct GUI_State current_state = {0};
 static char buff[256];
 
@@ -34,24 +10,6 @@ static char buff[256];
 
 void handleInput(enum INPUT e)
 {
-    switch(e)
-    {
-    case TOGGLE_PAUSE:
-        current_state.paused=!current_state.paused; break;
-    case SPEED_DOWN:
-        current_state.conf->delay*=1.3;
-        if(current_state.conf->delay>DELAY_MAX)
-             current_state.conf->delay=DELAY_MAX;
-        break;
-    case SPEED_UP:
-        current_state.conf->delay/=1.3;
-        if(current_state.conf->delay<=DELAY_MIN)
-            current_state.conf->delay=DELAY_MIN;
-        break;
-
-    default:
-        break;
-    }
 }
 
 static bool f_mark_by_index(void *_a, void *_b)
@@ -203,7 +161,7 @@ void GUI_render(){
     }
 }
 
-int GUI_create(struct GUI_conf *conf)
+int GUI_create(struct UI_conf *conf)
 {
     current_state.conf=conf;
     if(!conf->activate)

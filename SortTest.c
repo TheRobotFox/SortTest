@@ -15,12 +15,6 @@ typedef struct{
     int delay;
 } Settings;
 
-void free_Settings(Settings* Conf){
-    List_free(Conf->l);
-	if(Conf->output)
-	    fclose(Conf->output);
-    //free(Conf->SortAlgs);
-}
 
 void printSettings(Settings* Conf){
     printf("\nSortingalgorithms:\n");
@@ -29,8 +23,6 @@ void printSettings(Settings* Conf){
     printf("\nList_length: %ld\n",List_size(Conf->l));
     printf("Iterations: %d\n\n",Conf->iterations);
 }
-
-struct GUI_conf gui_conf = {0};
 
 List Test(List SortList, SortAlg *Alg, int iterations){
     List l = List_create(sizeof(S_TYPE));

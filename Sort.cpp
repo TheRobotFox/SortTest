@@ -1,7 +1,5 @@
 #include "Sort.h"
-#include "List/List.h"
 #include "SortTest.h"
-#include <stdio.h>
 
 static size_t comp;
 static size_t swap;
@@ -356,3 +354,21 @@ void ReculinSort(List l)
     GUI_windows_remove(o);
 }
 
+static LIST(GUI_Window_id) gulags=NULL;
+void GulagSort(List l)
+{
+
+    LIST_push(GUI_Window_id)(gulags, GUI_windows_append());
+    GUI_Window_foreground_set(u, (struct Color){255,0,0});
+    GUI_Window_background_set(u, (struct Color){127,127,127});
+    GUI_Window_title_set(u, "Urlaub");
+
+    o=GUI_windows_append();
+    GUI_Window_foreground_set(o, (struct Color){0,255,0});
+    GUI_Window_background_set(o, (struct Color){127,127,127});
+    GUI_Window_title_set(o, "Output");
+
+    _ReculinSort(l, 0);
+    GUI_windows_remove(u);
+    GUI_windows_remove(o);
+}

@@ -1,12 +1,6 @@
-#include "argparse.h"
 
 
-typedef struct{
-    short type;
-    char* name;
-    int (*resolve)(int ,arg*, int*, int, char**);
-} arg_resolver;
-
+/*
 #ifdef NSPIRE
 #define SEP "-"
 #else
@@ -14,35 +8,6 @@ typedef struct{
 #endif
 // Sortingalgorithms
 
-SortAlg Sorting_Algorithms[]= {
-    {"Bad_BubbleSort",Bad_BubbleSort},
-    {"BubbleSort",BubbleSort},
-    {"SelectionSort",SelectionSort},
-    {"StalinSort",StalinSort},
-    {"LSD"SEP"RadixSort",LSD_Radix},
-    {"InsertionSort",InsertionSort},
-    {"CocktailshakerSort",CocktailshakerSort},
-    {"QuickSort",QuickSort_launcher},
-    {"ReculinSort", ReculinSort},
-//#ifndef NSPIRE
-    {"BogoSort",BogoSort}
-//#endif
-
-
-
-};
-const int Sorting_Algorithms_count = sizeof(Sorting_Algorithms)/sizeof(SortAlg);
-
-//Filling Commands
-
-const FillCmd Fill_Commands[]={
-    {"fill",List_fill_to_n, "Normal fill 0-n"},
-    {"fill"SEP"reversed",List_fill_reversed,"Reverse order fill 0-n"},
-    {"fill"SEP"random",List_fill_random, "Fill 0-n and randomize"},
-    {"random",List_random_fill,"Fill with n random numbers 0-(n*10)"}
-};
-
-const int Fill_Commands_count = sizeof(Fill_Commands)/sizeof(FillCmd);
 
 // STANDARD
 
@@ -355,3 +320,4 @@ arg* arg_get(char id){
             return arguments+i;
     return 0;
 }
+*/
