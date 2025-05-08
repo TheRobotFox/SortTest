@@ -17,6 +17,12 @@ namespace UI {
     {
         unsigned char r,g,b;
     };
+    const Color grey {.r = 128, .g = 128, .b = 128};
+    const Color red {.r = 255, .g = 20, .b = 20};
+    const Color green {.r = 20, .g = 255, .b = 20};
+    const Color blue {.r = 20, .g = 20, .b = 200};
+    const Color white {.r = 255, .g = 255, .b = 255};
+    const Color black {.r=0, .g = 0, .b = 0};
 
     struct Config
     {

@@ -16,32 +16,19 @@ void Markings::accessed(const ElementCounter *e)
     std::lock_guard<std::mutex> g(mtx);
     max_temp = std::max(e->own_stats->get_total(), max_temp);
 
-    if(last_accessed[1] != nullptr)
-        marks.erase(last_accessed[1]);
     last_accessed[1] = last_accessed[0];
     last_accessed[0] = e;
 
-    marks[last_accessed[0]] = {.r = 255, .g = 255};
-
-    if(last_accessed[1] != nullptr)
-        marks[last_accessed[1]] = {.r = 255, .b = 255};
 }
-auto Markings::get_relative_temp(const ElementCounter *e) -> float
+auto Markings::get_temp(const ElementCounter *e) const -> float
 {
     return e->own_stats->get_total()/(float)max_temp;
 }
-auto Markings::get_color(const ElementCounter *e) -> UI::Color
+auto Markings::get_pointer(const ElementCounter *e) const -> Pointer
 {
-    std::lock_guard<std::mutex> g(mtx);
-
-    UI::Color col;
-    if(marks.contains(e))
-        col = marks[e];
-    else {
-        uint8_t channel = 255*(1.0-get_relative_temp(e));
-        col={.r = 255, .g = channel, .b = channel};
-    }
-    return col;
+    if(last_accessed[0]==e) return Pointer::PRIMARY;
+    if(last_accessed[1]==e) return Pointer::SECONDARY;
+    return Pointer::NONE;
 }
 
 auto ElementCounter::accessed(size_t (Stats::*member))
@@ -69,6 +56,16 @@ auto ElementCounter::operator<(ElementCounter &other) -> bool
     accessed(&Stats::comps);
     return this->elem<other.elem;
 }
+auto ElementCounter::operator>=(ElementCounter &other) -> bool
+{
+    accessed(&Stats::comps);
+    return this->elem>=other.elem;
+}
+auto ElementCounter::operator<=(ElementCounter &other) -> bool
+{
+    accessed(&Stats::comps);
+    return this->elem<=other.elem;
+}
 auto ElementCounter::read() -> T
 {
     accessed(&Stats::reads);
@@ -89,12 +86,9 @@ auto List::swap(Iterator a, Iterator b) -> void
     if(a>=list.end() || b>=list.end())
         throw std::out_of_range("List index OOB in swap!");
 
-    mtx.lock();
     auto tmp = *a;
     *a = *b;
     *b = tmp;
-
-    mtx.unlock();
 }
 
 void List::remove(Iterator a)

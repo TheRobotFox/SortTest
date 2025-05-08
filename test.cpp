@@ -56,15 +56,13 @@ auto main(int argc, const char **argv) -> int
 {
     std::vector<Builder> builders;
     std::vector<std::unique_ptr<SortAlgorithm>> sorts;
-    std::vector<T> list;
 
+    std::ranges::transform(SortAlgorithm::all, std::back_inserter(sorts),
+                            [](const auto& i){return i.get();});
     ArgParser ap(argc, argv,
                  Arg(builders, 'c', "create List using Builders", true),
                  Arg(sorts, 'a', "List of Algorithms to run"));
 
-    if(sorts.empty())
-        std::ranges::transform(SortAlgorithm::all, std::back_inserter(sorts),
-                               [](const auto& i){return i.get();});
 
 
     if(!ap.parse_args()){
@@ -72,21 +70,22 @@ auto main(int argc, const char **argv) -> int
         return -1;
     }
 
+    std::vector<T> list;
     for(auto &b : builders) b.builder->run(list, b.n);
 
     GUI::instance->start({.ops_per_second = 60});
 
     std::cout << list << '\n';
 
-
-    for(auto &s : sorts){
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        GUI::instance->set_algorithm(*s);
-        GUI::instance->set_speed(60);
-        s->run(list);
+    try {
+        for(auto &s : sorts){
+            GUI::instance->set_algorithm(*s);
+            GUI::instance->set_speed(60);
+            s->run(list);
+        }
+    } catch(GUI::ExitRequest &e){
+        std::cout << "Exit!\n";
     }
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
     GUI::instance->stop();
 }

@@ -55,11 +55,8 @@ protected:
             SetConfigFlags(FLAG_WINDOW_RESIZABLE);
             InitWindow(800, 450, "Sort Test");
             SetTargetFPS(30);
-            while(!active()){
-                ClearBackground(BLACK);
-                std::this_thread::sleep_for(std::chrono::milliseconds(10));
-            }
-            while(active()){
+
+            while(state != GUI::State::DESTROYED){
                 render();
                 ClearBackground(BLACK);
                 update();
@@ -74,7 +71,10 @@ protected:
 
     void update() override
     {
-        if(WindowShouldClose()) return stop();
+        if(WindowShouldClose()) {
+            stop();
+            return;
+        }
         char key;
         while((key = GetCharPressed()) > 0){
             KeyCmd cmd = KeyCmd::NONE;

@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
+#include <stdexcept>
 #include <thread>
 #include "../Sort.hpp"
 
@@ -14,11 +15,13 @@ auto GUI::start(Config conf) -> bool
     this->conf = conf;
     set_speed(conf.ops_per_second);
 
-    return ( initilized = create() );
+    if(!create()) return false;
+    state = State::CREATED;
+    return true;
 }
 void GUI::stop()
 {
-    initilized = false;
+    state = State::DESTROYED;
     destroy();
 }
 
@@ -57,7 +60,7 @@ void GUI::windows_map()
     int count = windows.size();
     if(count == 0) return;
 
-    int cols = floor(std::sqrt(count)),
+    int cols = round(std::sqrt(count)),
         y_size = screen_size.bottom/std::ceil(count/(float)cols);
 
     int row = 0, current_cols = 0, x_size, i=0;
@@ -106,10 +109,7 @@ void GUI::render_window_list(Window &w, const std::shared_ptr<List>& list)
             continue;
         }
 
-        UI::Color col = list->m.get_color(&e);
-
-
-        draw_rect(line,col);
+        draw_rect(line, w.style.foreground(&e, list->m));
     }
 }
 void GUI::render()
@@ -162,6 +162,7 @@ void GUI::render()
 }
 void GUI::wait_and_handle()
 {
+    if(state==State::DESTROYED) throw ExitRequest();
     if(!active()) return;
     auto s = std::chrono::steady_clock::now().time_since_epoch();
 
@@ -176,7 +177,7 @@ void GUI::wait_and_handle()
     auto e = std::chrono::steady_clock::now().time_since_epoch();
 
     auto delay = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::seconds(1))/conf.ops_per_second;
-    long wait_ms = std::chrono::duration_cast<std::chrono::milliseconds>(e-s+delay).count();
+    long wait_ms = std::chrono::duration_cast<std::chrono::milliseconds>(s-e+delay).count();
     sleep_while_active(std::max(wait_ms, 0L));
     // if(e-s < delay){
     //     sleep_while_active(delay-(e-s));

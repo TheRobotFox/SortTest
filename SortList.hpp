@@ -1,6 +1,7 @@
 #pragma once
 #include <algorithm>
 #include <cstddef>
+#include <cstdint>
 #include <iterator>
 #include <limits>
 #include <map>
@@ -27,12 +28,15 @@ class Markings
     size_t last_read;
     std::array<const ElementCounter*,2> last_accessed;
     size_t max_temp = 1;
-    auto get_relative_temp(const ElementCounter *e) -> float;
 public:
+    enum class Pointer : uint8_t{
+        PRIMARY, SECONDARY, NONE
+    };
     std::map<const ElementCounter *, UI::Color> marks;
 
     void accessed(const ElementCounter *e);
-    auto get_color(const ElementCounter *e) -> UI::Color;
+    auto get_temp(const ElementCounter *e) const -> float;
+    auto get_pointer(const ElementCounter *e) const -> Pointer;
 };
 
 class SortAlgorithm;
@@ -72,6 +76,8 @@ public:
     auto operator==(ElementCounter &other) -> bool;
     auto operator>(ElementCounter &other) -> bool;
     auto operator<(ElementCounter &other) -> bool;
+    auto operator>=(ElementCounter &other) -> bool;
+    auto operator<=(ElementCounter &other) -> bool;
     auto read() -> T;
 };
 
