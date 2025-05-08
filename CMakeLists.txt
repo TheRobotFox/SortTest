@@ -13,7 +13,12 @@ add_executable(SortTest
   test.cpp
   SortList.cpp
   UI/impl_Raylib.cpp
+  UI/GUI.cpp
   Util.cpp
-  Algorithms/BubbleSort.cpp)
+  Algorithms/BubbleSort.cpp
+  Algorithms/StalinSort.cpp
+  Algorithms/QuickSort.cpp
+  Algorithms/ReculinSort.cpp
+)
 
 target_link_libraries(SortTest -lraylib)

@@ -1,50 +1,89 @@
 #include "SortList.hpp"
+#include <cstddef>
 #include <iterator>
+#include <limits>
 #include <mutex>
 #include <random>
 #include <ranges>
 #include <thread>
 #include <vector>
-#include "UI/UI.hpp"
+#include "Factory.hpp"
+#include "UI/GUI.hpp"
 
 
-auto ElementCounter::operator==(const ElementCounter &other) -> bool
+void Markings::accessed(const ElementCounter *e)
 {
-    s->comps++;
-    UI::GUI::instance->wait_and_handle();
+    std::lock_guard<std::mutex> g(mtx);
+    max_temp = std::max(e->own_stats->get_total(), max_temp);
+
+    if(last_accessed[1] != nullptr)
+        marks.erase(last_accessed[1]);
+    last_accessed[1] = last_accessed[0];
+    last_accessed[0] = e;
+
+    marks[last_accessed[0]] = {.r = 255, .g = 255};
+
+    if(last_accessed[1] != nullptr)
+        marks[last_accessed[1]] = {.r = 255, .b = 255};
+}
+auto Markings::get_relative_temp(const ElementCounter *e) -> float
+{
+    return e->own_stats->get_total()/(float)max_temp;
+}
+auto Markings::get_color(const ElementCounter *e) -> UI::Color
+{
+    std::lock_guard<std::mutex> g(mtx);
+
+    UI::Color col;
+    if(marks.contains(e))
+        col = marks[e];
+    else {
+        uint8_t channel = 255*(1.0-get_relative_temp(e));
+        col={.r = 255, .g = channel, .b = channel};
+    }
+    return col;
+}
+
+auto ElementCounter::accessed(size_t (Stats::*member))
+{
+    (list_stats->*member)++;
+    (own_stats.get()->*member)++;
+    m->accessed(this);
+    GUI::instance->wait_and_handle();
+}
+
+auto ElementCounter::operator==(ElementCounter &other) -> bool
+{
+    accessed(&Stats::comps);
+    other.accessed(&Stats::comps);
     return this->elem==other.elem;
 }
-auto ElementCounter::operator>(const ElementCounter &other) -> bool
+auto ElementCounter::operator>(ElementCounter &other) -> bool
 {
-    s->comps++;
-    UI::GUI::instance->wait_and_handle();
+    accessed(&Stats::comps);
+    other.accessed(&Stats::comps);
     return this->elem>other.elem;
 }
-auto ElementCounter::operator<(const ElementCounter &other) -> bool
+auto ElementCounter::operator<(ElementCounter &other) -> bool
 {
-    s->comps++;
-    UI::GUI::instance->wait_and_handle();
+    accessed(&Stats::comps);
     return this->elem<other.elem;
 }
 auto ElementCounter::read() -> T
 {
-    s->reads++;
-    UI::GUI::instance->wait_and_handle();
+    accessed(&Stats::reads);
     return elem;
 }
 
 auto ElementCounter::operator=(const ElementCounter &other) -> ElementCounter&
 {
-    this->elem = other.elem;
-    this->s = other.s;
-    this->m = other.m;
-    // TODO stats
-    m->assinged(this);
+    assign(other);
+    accessed(&Stats::assigns);
     return *this;
 }
 
 
-auto List::swap(It a, It b) -> void
+auto List::swap(Iterator a, Iterator b) -> void
 {
     s.swaps++;
     if(a>=list.end() || b>=list.end())
@@ -54,27 +93,58 @@ auto List::swap(It a, It b) -> void
     auto tmp = *a;
     *a = *b;
     *b = tmp;
+
     mtx.unlock();
-    UI::GUI::instance->wait_and_handle();
 }
 
-void List::remove(It a)
+void List::remove(Iterator a)
 {
     if(a>= list.end())
         throw std::out_of_range("List a OOB in remove!");
 
     bool dirty_max = max == a->elem;
+    if(a<end()-1){
+        mtx.lock();
 
-    {
-        std::lock_guard<std::mutex> g(mtx);
-        list.erase(a);
+        a->elem = std::numeric_limits<T>::min();
+        namespace r = std::ranges;
+        max = r::max(list | r::views::transform([](ElementCounter& e){return e.elem;}));
+
+        mtx.unlock();
+
+        while (++a<end()) (a-1)->assign(*a);
     }
 
-    namespace r = std::ranges;
-    if(dirty_max) max = r::max(list | r::views::transform([](ElementCounter& e){return e.elem;}));
-    UI::GUI::instance->wait_and_handle();
+    std::lock_guard<std::mutex> g(mtx);
+    list.pop_back();
 }
 
+auto List::verify() -> bool
+{
+
+    auto it = list.begin();
+    m.marks[it.base()] = {.g = 200};
+
+    SlowDown s(*GUI::instance, size()/2);
+
+    while(++it<list.end()){
+        if((it-1)->elem > it->elem){
+            m.marks[it.base()] = {.r = 200};
+            std::this_thread::sleep_for(std::chrono::seconds(2));
+            return false;
+        }
+        m.marks[it.base()] = {.g = 200};
+        GUI::instance->wait_and_handle();
+    }
+    return true;
+}
+
+void List::push(ElementCounter &e)
+{
+    std::lock_guard<std::mutex> g(mtx);
+    list.push_back(ElementCounter(e.elem, &s, &m));
+    max = std::max(max, e.elem);
+}
 
 // List Builders
 
@@ -95,9 +165,6 @@ struct FillShuffle : ListBuilder
         shuffle(tmp, gen_rand);
         copy(tmp, std::back_inserter(l));
     }
-    FillShuffle()
-        : ListBuilder("fill_shfl", "Insert elements 1..n Suffled")
-    {}
 };
 
 struct Random : ListBuilder
@@ -112,9 +179,6 @@ struct Random : ListBuilder
 
         copy(tmp, std::back_inserter(l));
     }
-    Random()
-        : ListBuilder("random", "Insert n random elements")
-    {}
 };
 struct FillReversed : ListBuilder
 {
@@ -125,9 +189,6 @@ struct FillReversed : ListBuilder
         copy(views::iota(1) | views::take(n) | views::reverse,
              std::back_inserter(l));
     }
-    FillReversed()
-        : ListBuilder("fill_rev", "Insert elements n..1")
-    {}
 };
 struct Fill : ListBuilder
 {
@@ -138,13 +199,11 @@ struct Fill : ListBuilder
         copy(views::iota(1) | views::take(n),
              std::back_inserter(l));
     }
-    Fill() : ListBuilder("fill", "Insert elements 1..n")
-    {}
 };
 
-std::vector<ListBuilder*> ListBuilder::all = {
-    new Fill(),
-    new FillReversed(),
-    new FillShuffle(),
-    new Random()
-    };
+const std::vector<InstanceBuilder<ListBuilder>> ListBuilder::all = Factory<ListBuilder>()
+    .add<FillShuffle>("fill_shfl", "Insert elements 1..n Suffled")
+    .add<Random>("random", "Insert n random elements")
+    .add<FillReversed>("fill_rev", "Insert elements n..1")
+    .add<Fill>("fill", "Insert elements 1..n")
+    .done;

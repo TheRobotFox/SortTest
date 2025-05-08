@@ -12,8 +12,8 @@ void BadBubbleSort::sort(List &l) {
 
 void BubbleSort::sort(List &l) {
 
-    for(size_t j=0; j<l.size()-1; j++){
-        for(size_t i=j; i<l.size()-1; i++){
+    for(size_t j=1; j<l.size()-1; j++){
+        for(size_t i=0; i<l.size()-j; i++){
             if(l[i]>l[i+1]) l.swap(l+i, l+i+1);
         }
     }

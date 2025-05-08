@@ -1,43 +1,40 @@
-
+#include "Factory.hpp"
 #include "argparse.hpp"
 #include "Sort.hpp"
+#include <algorithm>
+#include <ranges>
 #include <chrono>
-#include <cstdio>
 #include <iostream>
+#include <iterator>
 #include <memory>
 #include <raylib.h>
 #include <thread>
-#include <type_traits>
 #include "SortList.hpp"
 
 struct Builder {
-    ListBuilder *builder;
+    std::unique_ptr<ListBuilder> builder;
     int n;
 };
-template<typename T> requires
-    requires(T& e){
-        e->name;
-        e->description;
-        std::remove_pointer_t<T>::all;
-    }
-struct ArgParse<T>
+template<class P>
+requires has_factory<typename P::element_type>
+struct ArgParse<P>
 {
-    using C = std::remove_pointer_t<T>;
-    auto operator()(const char *text, C*& val) -> bool
+    using T = P::element_type;
+    constexpr auto operator()(const char *text, P& val) -> bool
     {
         std::string name(text);
 
-        for(C *e : C::all){
-            if(e->name==name){
+        for(const InstanceBuilder<T> &e : T::all){
+            if(e.name==name){
 
-                val = e;
+                val = std::move(e.get());
                 return true;
             }
         }
         std::cout << "Unknown Name: " << text << "\n";
         std::cout << "Available:" << '\n';
-        for(C *e : C::all)
-            std::cout << e->name << " - " << e->description << '\n';
+        for(const InstanceBuilder<T> &e : T::all)
+            std::cout << e.describe() << '\n';
 
         return false;
     }
@@ -48,10 +45,9 @@ struct ArgParse<Builder>
     auto operator()(const char *text, Builder& val) -> bool
     {
         std::string str(text);
-        if(!ArgParse<ListBuilder*>()
+        if(!ArgParse<std::unique_ptr<ListBuilder>>()
            (str.substr(0,str.find(':')).c_str(), val.builder)) return false;
-        if(!ArgParse<int>()(text+str.find(':')+1, val.n)) return false;
-        return true;
+        return ArgParse<int>()(text+str.find(':')+1, val.n);
     }
 };
 
@@ -59,12 +55,16 @@ struct ArgParse<Builder>
 auto main(int argc, const char **argv) -> int
 {
     std::vector<Builder> builders;
-    std::vector<SortAlgorithm*> sorts = SortAlgorithm::all;
+    std::vector<std::unique_ptr<SortAlgorithm>> sorts;
     std::vector<T> list;
 
     ArgParser ap(argc, argv,
                  Arg(builders, 'c', "create List using Builders", true),
                  Arg(sorts, 'a', "List of Algorithms to run"));
+
+    if(sorts.empty())
+        std::ranges::transform(SortAlgorithm::all, std::back_inserter(sorts),
+                               [](const auto& i){return i.get();});
 
 
     if(!ap.parse_args()){
@@ -72,20 +72,21 @@ auto main(int argc, const char **argv) -> int
         return -1;
     }
 
-    for(auto b : builders) b.builder->run(list, b.n);
+    for(auto &b : builders) b.builder->run(list, b.n);
 
-    UI::GUI::instance->start({.ops_per_second = 40});
+    GUI::instance->start({.ops_per_second = 60});
 
     std::cout << list << '\n';
 
 
-    for(auto *s : sorts){
+    for(auto &s : sorts){
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        UI::GUI::instance->set_algorithm(s);
+        GUI::instance->set_algorithm(*s);
+        GUI::instance->set_speed(60);
         s->run(list);
-        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
     }
 
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
-    UI::GUI::instance->stop();
+    GUI::instance->stop();
 }

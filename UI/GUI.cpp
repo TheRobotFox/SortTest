@@ -1,481 +1,208 @@
-#include "GUI_impl.h"
-#include "Font.font.h"
+#include "GUI.hpp"
+#include <chrono>
+#include <cmath>
+#include <cstddef>
+#include <cstdint>
+#include <cstdlib>
+#include <thread>
+#include "../Sort.hpp"
 
-struct GUI_State current_state = {0};
-static char buff[256];
+using namespace UI;
 
-
-#define DELAY_MIN 0.000001
-#define DELAY_MAX 100000
-
-void handleInput(enum INPUT e)
+auto GUI::start(Config conf) -> bool
 {
+    this->conf = conf;
+    set_speed(conf.ops_per_second);
+
+    return ( initilized = create() );
+}
+void GUI::stop()
+{
+    initilized = false;
+    destroy();
 }
 
-static bool f_mark_by_index(void *_a, void *_b)
+auto GUI::set_speed(float ops) -> size_t
 {
-    struct GUI_Mark *a=_a;
-    int *b = _b;
-    return a->index==*b;
+    size_t prev = conf.ops_per_second;
+    conf.ops_per_second = ops;
+    return prev;
 }
 
-static int f_Draw_Rect(Font_Rect *rect, void *col)
+void GUI::handle_inputs()
 {
-    struct Rect rc = {rect->x, rect->y, rect->x+rect->width, rect->y+rect->height};
-    Draw_Rect(&rc, *(struct Color*)col);
-    return 0;
-}
-static void Draw_Text(int x, int y, const char *text, size_t len, int size, struct Color col)
-{
-    Font_render_string_rect(&font, text, len, x, y, size, f_Draw_Rect, &col);
-}
-
-static void GUI_Window_render(struct GUI_Window *win)
-{
-    struct Rect rect = win->rect,
-                line;
-    struct Color col;
-
-    Draw_Rect(&rect, win->background);
-    //Draw List
-    if(win->l){
-
-        int skip = current_state.conf->skip_pixels+1,
-            list_size = List_size(win->l);
-        S_TYPE *data = List_start(win->l),
-               max = get_max(win->l);
-        int oldindex = 0,index;
-
-        line.bottom=rect.bottom;
-
-        for(float x=rect.left; x<=rect.right-skip; x+=skip){
-
-            // Calc Rect dimentions
-            index=(int)((x-rect.left)/(float)(rect.right-1)*(list_size));
-
-            line.left=x;
-            line.top=rect.bottom-data[index]/(float)max*(rect.bottom-rect.top)/1.1;
-
-            line.right=x+skip;
-
-            // Render seperation
-            if(index!=oldindex && list_size*current_state.conf->mergedistance<rect.right){
-                oldindex=index;
-                continue;
-            }
-
-            // Create Rect and color pointers
-            struct GUI_Mark *mark = List_finde(win->marks, f_mark_by_index, &index);
-            if(mark)
-                col=mark->col;
-            else
-                col=win->foreground;
-
-            Draw_Rect(&line,col);
-
-        }
-
-        if(win->title){
-            unsigned char color = 255*(1-round((float)(win->background.r+win->background.g+win->background.b)/255.0f/3.0f));
-            int size=(win->rect.bottom-win->rect.top)/15;
-            Font_Rect title_size = Font_string_dimensions(&font, win->title, win->title_len, size);
-            Draw_Text(win->rect.right-title_size.width-1, win->rect.top+1, win->title, win->title_len, size, (struct Color){color,color,color});
-        }
-
-    }
-}
-
-static void GUI_windows_map_square(List l)
-{
-    struct Rect rect = get_screen_dimensions();
-
-    // window manager
-    unsigned int window_count = List_size(l),
-        rows = ceil(sqrt(window_count)),
-        // TODO: float precition offsets
-        y_offset = 0,
-        x_offset,
-        coll;
-    struct GUI_Window *data = List_start(l);
-
-    for(int r=0; r < rows; r++)
+    #define OPS_MAX 100000000
+    #define OPS_MIN 0.1
+    switch(get_key())
     {
-        coll = window_count/rows + window_count%rows;
-        window_count-=coll;
-        //printf("%d -> %d | %d\n", window_count, rows, coll);
-        x_offset = 0;
-        for(int w=0; w < coll; w++)
-        {
-            data->rect = (struct Rect){x_offset,y_offset, x_offset+rect.right/coll, y_offset+rect.bottom/rows};
-            data++;
-            x_offset+=rect.right/coll;
-        }
-        y_offset+=rect.bottom/rows;
-    }
-}
+    using enum KeyCmd;
 
-static void GUI_windows_mapper()
-{
-    switch(current_state.conf->mapping)
-    {
-    default:
-        GUI_windows_map_square(current_state.windows);
-        return;
-    }
-}
+    case TOGGLE_PAUSE:
+        paused=!paused; break;
+    case SPEED_DOWN:
 
-void GUI_render(){
-    if(current_state.conf->do_render){
-
-        current_state.rendering = 1;
-        Draw_begin();
-
-        // Map windows to rects
-        GUI_windows_mapper();
-
-        // Render windows
-        for(struct GUI_Window *start = List_start(current_state.windows),
-                              *end = List_end(current_state.windows);
-                              start != end; start++)
-        {
-            if(start->do_render){
-                start->rendering = 1;
-                GUI_Window_render(start);
-                start->rendering = 0;
-            }
-        }
-
-        // Render Overlay
-        if(current_state.conf->Alg){
-            struct Rect rect = get_screen_dimensions();
-            int length=snprintf(buff,255,"%-20s - %.3fs",current_state.conf->Alg->name,current_state.conf->Alg->time/CLOCKS_PER_SEC);
-            Draw_Text(1, (rect.bottom/10-rect.bottom/15)/2, buff, length, rect.bottom/15, (struct Color){255,255,255});
-
-            // Print Pause
-            if(current_state.paused){
-                Draw_Text(rect.right/2, 0, "Paused", 6, rect.bottom/15, (struct Color){255,0,0});
-            }
-        }
-        Draw_end();
-        current_state.rendering = 0;
-    }
-}
-
-int GUI_create(struct UI_conf *conf)
-{
-    current_state.conf=conf;
-    if(!conf->activate)
-        return 0;
-
-    current_state.windows = LIST_create(struct GUI_Window);
-    current_state.rendering=0;
-    current_state.paused=0;
-
-    GUI_impl_create();
-
-    return 0;
-}
-
-void GUI_destroy()
-{
-    current_state.conf->do_render = 0;
-    while(current_state.rendering) Sleep(5);
-
-    for(struct GUI_Window *start = List_start(current_state.windows),
-                          *end = List_end(current_state.windows);
-                          start < end; start++)
-        GUI_windows_remove(start->id);
-
-    current_state.conf->active=0;
-
-    List_free(current_state.windows);
-
-    GUI_impl_destroy();
-}
-
-void GUI_update(int force){
-    if(current_state.conf->active){
-        static int skiped=0;
-        if(skiped>=current_state.skip_frames || force){
-            skiped=0;
-            GUI_impl_update();
-        }
-        skiped++;
-        current_state.skip_frames = 0.07/sqrt(current_state.conf->delay);
-    }
-}
-
-
-#ifdef NSPIRE
-
-static void getKey(){
-    static int pressed=0;
-
-		if(isKeyPressed(KEY_NSPIRE_ESC)){
-        current_state.conf->active=0;
-        wait_no_key_pressed();
-    }
-
-    if(isKeyPressed(KEY_NSPIRE_P)){
-        handleInput(TOGGLE_PAUSE);
-        wait_no_key_pressed();
-    }
-
-    if(!any_key_pressed())
-        pressed=0;
-    if(pressed)
-        return;
-		if(isKeyPressed(KEY_NSPIRE_PLUS)){
-				pressed=1;
-        handleInput(SPEED_DOWN);
-    }
-		if(isKeyPressed(KEY_NSPIRE_MINUS)){
-				pressed=1;
-        handleInput(SPEED_UP);
-    }
-
-}
-
-#endif
-
-
-void GUI_wait(){
-    if(current_state.conf->active){
-        // Correct time for delay
-        #ifdef NSPIRE
-        getKey();
-        #else
-        current_state.conf->Alg->time+=clock()-current_state.conf->Alg->time_start;
-        #endif
-        if(current_state.paused){
-            //current_state.conf->Alg->time+=clock()-INFO->Alg->time_start;
-            #ifdef NSPIRE
-            while(!isKeyPressed(KEY_NSPIRE_P) && !isKeyPressed(KEY_NSPIRE_ESC))
-                ;
-            #else
-            while(current_state.paused)
-                Sleep(5);
-            #endif
-            //current_state.conf->Alg->time_start=clock();
-        }else{
-
-            if(current_state.conf->delay){
-                // sub 1ms wait with time smearing
-                static float time=0;
-                time+=current_state.conf->delay/10;
-                if((int)time){
-                    Sleep((int)time);
-                    time-=(int)time;
-                }
-            }
-
-        }
-    #ifndef NSPIRE
-        current_state.conf->Alg->time_start=clock();
-    #endif
-    }
-}
-
-static bool f_win_by_id(void *_a, void *_b)
-{
-    struct GUI_Window *a=_a;
-    GUI_Window_id *b = _b;
-    return a->id==*b;
-}
-
-union U_GUI_Window_id_wrapper
-{
-    GUI_Window_id id;
-    void *ptr;
-};
-
-static void f_List_realloc_callback_stop_render(List l, enum E_CALLBACK_MSG msg, void *arg)
-{
-    union U_GUI_Window_id_wrapper wrapped_id = (union U_GUI_Window_id_wrapper)arg;
-    GUI_Window_id id = wrapped_id.id;
-    switch(msg)
-    {
-    case CM_PRE_REALLOC:
-        GUI_Window_do_render(id, 0);
+        if((conf.ops_per_second /=1.1) < OPS_MIN) conf.ops_per_second=OPS_MIN;
         break;
-
-    case CM_POST_REALLOC:
-        GUI_Window_do_render(id, 1);
+    case SPEED_UP:
+        if((conf.ops_per_second *=1.1) > OPS_MAX) conf.ops_per_second=OPS_MAX;
         break;
-
     default:
         break;
     }
 }
 
-GUI_Window_id GUI_windows_append()
+void GUI::windows_map()
 {
-    if(current_state.conf->active){
 
-        static GUI_Window_id current_id;
+    int count = windows.size();
+    if(count == 0) return;
 
-        if(!List_size(current_state.windows))
-            current_id=0;
+    int cols = floor(std::sqrt(count)),
+        y_size = screen_size.bottom/std::ceil(count/(float)cols);
 
-        current_state.conf->do_render = 0;
-        while(current_state.rendering) Sleep(5);
-
-        struct GUI_Window *win = List_push(current_state.windows, NULL);
-
-        win->id=current_id++;
-        win->marks = List_create(sizeof(struct GUI_Mark));
-
-        //set callback for realloc
-        union U_GUI_Window_id_wrapper wrapped_id = {win->id};
-        List_realloc_callback(win->marks, f_List_realloc_callback_stop_render, wrapped_id.ptr);
-
-        win->opacity=1.0f;
-        win->do_render = 1;
-        win->rendering = 0;
-        win->title=NULL;
-        win->foreground = (struct Color){255,255,255};
-        win->background = (struct Color){0,0,0};
-
-        current_state.conf->do_render = 1;
-
-        // Remap all windows
-        //GUI_windows_mapper();
-        //for(struct GUI_Window *start = List_start(current_state.windows),
-        //                          *end = List_end(current_state.windows);
-        //                          start != end; start++)
-        //    {
-        //printf("%d -> %d | %d | %d | %d\n", start->id, start->rect.left, start->rect.top, start->rect.right, start->rect.bottom);
-        //    }
-
-        return win->id;
-    }
-    return -1;
-}
-
-void GUI_windows_remove(GUI_Window_id id)
-{
-    if(current_state.conf->active){
-        struct GUI_Window *win = List_finde(current_state.windows, f_win_by_id, &id);
-        if(win){
-            current_state.conf->do_render = 0;
-            while(current_state.rendering) Sleep(5);
-            List_free(win->marks);
-            List_rmi(current_state.windows, win-LIST_start(struct GUI_Window)(current_state.windows));
-            current_state.conf->do_render = 1;
+    int row = 0, current_cols = 0, x_size, i=0;
+    for(auto& win : windows){
+        if(current_cols==0){
+            current_cols = std::min(count,cols);
+            x_size = screen_size.right/current_cols;
+            count-=current_cols;
+            i=0;
+            row++;
         }
+        win->rect = {
+        .left = x_size*i, .top = y_size*(row-1),
+            .right = x_size*(i+1), .bottom = y_size*row
+        };
+        current_cols--;
+        i++;
     }
 }
 
-unsigned int List_get_max(List l);
-
-void GUI_Window_set_list(GUI_Window_id id, List l)
+void GUI::render_window_list(Window &w, const std::shared_ptr<List>& list)
 {
-    if(current_state.conf->active){
+    // clear Background
+    draw_rect(w.rect, w.style.background);
+    if(list->size()==0) return;
 
-        struct GUI_Window *win = List_finde(current_state.windows, f_win_by_id, &id);
-        if(win){
+    float step = conf.resolution_scale;
 
-            int tmp = win->do_render;
-            win->do_render = 0;
-            while(win->rendering) Sleep(5);
-            win->l = l;
-            //set callback for realloc
-            union U_GUI_Window_id_wrapper wrapped_id = {id};
-            List_realloc_callback(win->l, f_List_realloc_callback_stop_render, wrapped_id.ptr);
-            List_clear(win->marks);
-            win->do_render = tmp;
+    int old_index = -1;
+
+    for(float x=w.rect.left; x<=w.rect.right-step; x+=step){
+
+        int index=(int)((x-w.rect.left)/(float)(w.rect.right-w.rect.left)*(list->size()));
+        const ElementCounter &e = list->list[index];
+
+        Rect line;
+
+        line.left=x;
+        line.top=w.rect.bottom-e.elem/(float)list->max*(w.rect.bottom-w.rect.top)*0.9;
+
+        line.right=x+step;
+
+        // Render seperation
+        if(index!=old_index && (int)list->size()*conf.mergedistance<w.rect.right){
+            old_index=index;
+            continue;
         }
+
+        UI::Color col = list->m.get_color(&e);
+
+
+        draw_rect(line,col);
     }
 }
-
-
-void GUI_Window_marks_add(GUI_Window_id id, size_t index, struct Color col)
+void GUI::render()
 {
-    if(current_state.conf->active){
-        struct GUI_Window *win = List_finde(current_state.windows, f_win_by_id, &id);
-        if(win){
+    static Rect screen_size_last = {};
 
-            struct GUI_Mark *mark = List_finde(win->marks, f_mark_by_index, &index);
-            if(!mark)
-                mark = List_push(win->marks, NULL); // stops render in case of realloc
+    mtx.lock();
+    screen_size = get_screen_dimensions();
 
-            mark->index = index;
-            mark->col = col;
+    if((windows.remove_if([](auto &win){
+        return win->l.expired();
+    }) != 0U) || screen_size!=screen_size_last)
+        windows_map();
+
+    screen_size_last = screen_size;
+
+    draw_begin();
+    for(auto &win : windows){
+
+        // Draw List
+        if(auto list = win->l.lock())
+        {
+            std::lock_guard<std::mutex> g(list->mtx);
+            render_window_list(*win, list);
         }
+
+        //Draw Window Title
+        int win_len = win->rect.right-win->rect.left;
+        int win_hei = win->rect.bottom-win->rect.top;
+        Rect text_rect = {
+            .left = win->rect.right - (win_len/5),
+            .top = win->rect.top,
+            .right = win->rect.right,
+            .bottom = win->rect.top + (win_hei/5)
+        };
+        draw_text(text_rect, win->title);
     }
+
+    if(current != nullptr){
+        Rect text_rect = {
+            .left = 0,
+            .top = 0,
+            .right = screen_size_last.right/4,
+            .bottom = screen_size_last.bottom/10
+        };
+        draw_text(text_rect, current->name);
+    }
+    mtx.unlock();
+    draw_end();
 }
-
-
-void GUI_Window_marks_remove(GUI_Window_id id, size_t index)
+void GUI::wait_and_handle()
 {
-    if(current_state.conf->active){
-        struct GUI_Window *win = List_finde(current_state.windows, f_win_by_id, &id);
-        if(win){
-            struct GUI_Mark *mark = List_finde(win->marks, f_mark_by_index, &index);
-            if(mark)
-                List_rmi(win->marks, mark-LIST_start(struct GUI_Mark)(win->marks));
-        }
+    if(!active()) return;
+    auto s = std::chrono::steady_clock::now().time_since_epoch();
+
+    handle_inputs();
+    while (paused){
+        handle_inputs();
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
+
+
+    // Render
+    auto e = std::chrono::steady_clock::now().time_since_epoch();
+
+    auto delay = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::seconds(1))/conf.ops_per_second;
+    long wait_ms = std::chrono::duration_cast<std::chrono::milliseconds>(e-s+delay).count();
+    sleep_while_active(std::max(wait_ms, 0L));
+    // if(e-s < delay){
+    //     sleep_while_active(delay-(e-s));
+    //     current->time += delay; // compensate for Rendering
+    // } else {
+    //     current->time += (e-s); // compensate for Rendering
+    // }
 }
 
-void GUI_Window_marks_clear(GUI_Window_id id)
+auto GUI::create_window(std::weak_ptr<List> l) -> std::weak_ptr<Window>
 {
-    if(current_state.conf->active){
-        struct GUI_Window *win = List_finde(current_state.windows, f_win_by_id, &id);
-        if(win)
-            List_clear(win->marks);
-    }
-}
+    auto win = std::make_shared<Window>();
+    win->l = std::move(l);
 
-void GUI_Window_foreground_set(GUI_Window_id id, struct Color col)
+    std::lock_guard<std::mutex> g(mtx);
+
+    windows.remove_if([](auto &win){
+        return win->l.expired();
+    });
+    windows.emplace_back(win);
+    windows_map();
+
+    return win;
+}
+void GUI::set_algorithm(const SortAlgorithm &algorithm)
 {
-    if(current_state.conf->active){
-        struct GUI_Window *win = List_finde(current_state.windows, f_win_by_id, &id);
-        if(win)
-            win->foreground=col;
-    }
+    std::lock_guard<std::mutex> g(mtx);
+    current = &algorithm;
 }
-
-void GUI_Window_background_set(GUI_Window_id id, struct Color col)
-{
-    if(current_state.conf->active){
-        struct GUI_Window *win = List_finde(current_state.windows, f_win_by_id, &id);
-        if(win)
-            win->background=col;
-    }
-}
-
-void GUI_Window_title_set(GUI_Window_id id, const char *title)
-{
-    if(current_state.conf->active){
-        struct GUI_Window *win = List_finde(current_state.windows, f_win_by_id, &id);
-        if(win){
-            win->title=title;
-            if(title)
-                win->title_len=strlen(title);
-        }
-    }
-}
-
-const char* GUI_Window_title_get(GUI_Window_id id)
-{
-    if(current_state.conf->active){
-        struct GUI_Window *win = List_finde(current_state.windows, f_win_by_id, &id);
-        if(win)
-            return win->title;
-    }
-    return NULL;
-}
-
-void GUI_Window_do_render(GUI_Window_id id, int do_render)
-{
-    if(current_state.conf->active){
-        struct GUI_Window *win = List_finde(current_state.windows, f_win_by_id, &id);
-        if(win){
-            win->do_render=do_render;
-            if(!do_render)
-                while(win->rendering) Sleep(5);
-        }
-    }
-}
-

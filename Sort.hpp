@@ -1,13 +1,13 @@
 #pragma once
 #include "SortList.hpp"
+#include "Factory.hpp"
 #include <cassert>
 #include <memory>
 #include <chrono>
 #include <utility>
-#include "UI/UI.hpp"
+#include "UI/GUI.hpp"
 
 using TimeStamp = std::chrono::time_point<std::chrono::steady_clock>;
-using UI::GUI;
 
 class SortAlgorithm
 {
@@ -16,9 +16,9 @@ class SortAlgorithm
 
 protected:
 
-    auto create_list(std::string name, UI::WindowStyle style = {}) -> std::shared_ptr<List>
+    auto create_list(std::string name, WindowStyle style = {}) -> std::shared_ptr<List>
     {
-        auto list = std::make_shared<List>(std::vector<T>(), s);
+        auto list = std::make_shared<List>(s);
         auto win = GUI::instance->create_window(list).lock();
 
         if(win){
@@ -31,22 +31,22 @@ protected:
     virtual void sort(List &l) = 0;
 public:
 
-    const std::string name;
-    const std::string description;
-    static std::vector<SortAlgorithm*> all;
-    SortAlgorithm(std::string &&name) : name(name)
+    std::string name;
+    SortAlgorithm(std::string name)
+        : name(std::move(name))
     {}
+    static const std::vector<InstanceBuilder<SortAlgorithm>> all;
     auto run(std::vector<T> in) -> bool
     {
         auto list = std::make_shared<List>(in, s);
-        UI::GUI::instance->create_window(list);
+        GUI::instance->create_window(list);
         sort(*list);
+        bool res = list->verify();
         std::cout << *list << '\n';
-        // TODO: verify
-        return false;
+        return res;
     }
 
-        virtual ~SortAlgorithm() = default;
+    virtual ~SortAlgorithm() = default;
 };
 
 void status_reset();

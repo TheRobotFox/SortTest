@@ -76,7 +76,7 @@ struct ArgParse<C<T>>
 {
     auto operator()(const char* text, std::vector<T>& arg) -> bool
     {
-        arg = {};
+        arg.clear();
         auto ins = std::back_inserter(arg);
 
         std::stringstream ss(text);
