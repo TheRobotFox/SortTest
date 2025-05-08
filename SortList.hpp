@@ -2,18 +2,27 @@
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
-#include <map>
 #include <mutex>
 #include <ranges>
 #include <stdexcept>
 #include <vector>
-#include "UI/OS.hpp"
 #include <iostream>
 #include "Util.hpp"
 
 struct Stats
 {
     size_t comps = 0, swaps = 0, reads = 0;
+};
+
+struct Markings
+{
+    size_t last_read;
+    std::array<ElementCounter*,2> last_cmpared, last_assigned;
+
+    void assinged(ElementCounter *e){
+        last_assigned[1] = last_assigned[0];
+        last_assigned[0] = e;
+    }
 };
 
 class SortAlgorithm;
@@ -27,40 +36,29 @@ using T = int;
 
 class ElementCounter {
     T elem;
-    Stats s;
+    Stats *s;
+    Markings *m;
+
     friend List;
     friend UI::GUI;
     friend auto operator<< (std::ostream&  out, const ElementCounter& l) -> std::ostream&;
     // provate copy constructor
-    ElementCounter(T e)
-        : elem(e)
+    ElementCounter(T e, Stats *s, Markings *m)
+        : elem(e), s(s), m(m)
     {}
 public:
-    auto operator==(ElementCounter &other) -> bool
-    {
-        s.comps++;
-        return this->elem==other.elem;
-    }
-    auto operator>(ElementCounter &other) -> bool
-    {
-        s.comps++;
-        return this->elem>other.elem;
-    }
-    auto operator<(ElementCounter &other) -> bool
-    {
-        s.comps++;
-        return this->elem<other.elem;
-    }
-    auto read() -> T
-    {
-        s.reads++;
-        return elem;
-    }
+    auto operator=(const ElementCounter &other) -> ElementCounter&;
+    auto operator==(const ElementCounter &other) -> bool;
+    auto operator>(const ElementCounter &other) -> bool;
+    auto operator<(const ElementCounter &other) -> bool;
+    auto read() -> T;
 };
 
 class List
 {
     Stats &s;
+    Markings m;
+
     friend SortAlgorithm;
     friend auto operator<< (std::ostream&  /*out*/, const List& /*l*/) -> std::ostream&;
     friend UI::GUI;
@@ -70,7 +68,6 @@ class List
 
     T max;
 
-    std::map<size_t, UI::Color> marks;
 
     std::mutex mtx;
 
@@ -83,7 +80,7 @@ public:
     {
         max = std::ranges::max(list);
         std::ranges::transform(list, std::back_inserter(this->list),
-                               [](T i){return ElementCounter(i);});
+                               [this,&s](T i){return ElementCounter(i,&s,&m);});
     }
 
     auto swap(It a, It b) -> void;
@@ -91,9 +88,8 @@ public:
     {
         return list.size();
     }
-    auto at(size_t index) -> ElementCounter
+    auto at(size_t index) -> ElementCounter&
     {
-        s.reads++;
         if(index>= list.size())
             throw std::out_of_range("List index OOB in read!");
         return list[index];

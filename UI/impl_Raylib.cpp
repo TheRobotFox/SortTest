@@ -60,6 +60,7 @@ protected:
             SetTargetFPS(30);
             while(true){
                 render();
+                ClearBackground(BLACK);
                 update();
             }
         });

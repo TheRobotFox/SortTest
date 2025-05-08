@@ -8,6 +8,42 @@
 #include "UI/UI.hpp"
 
 
+auto ElementCounter::operator==(const ElementCounter &other) -> bool
+{
+    s->comps++;
+    UI::GUI::instance->wait_and_handle();
+    return this->elem==other.elem;
+}
+auto ElementCounter::operator>(const ElementCounter &other) -> bool
+{
+    s->comps++;
+    UI::GUI::instance->wait_and_handle();
+    return this->elem>other.elem;
+}
+auto ElementCounter::operator<(const ElementCounter &other) -> bool
+{
+    s->comps++;
+    UI::GUI::instance->wait_and_handle();
+    return this->elem<other.elem;
+}
+auto ElementCounter::read() -> T
+{
+    s->reads++;
+    UI::GUI::instance->wait_and_handle();
+    return elem;
+}
+
+auto ElementCounter::operator=(const ElementCounter &other) -> ElementCounter&
+{
+    this->elem = other.elem;
+    this->s = other.s;
+    this->m = other.m;
+    // TODO stats
+    m->assinged(this);
+    return *this;
+}
+
+
 auto List::swap(It a, It b) -> void
 {
     s.swaps++;

@@ -74,17 +74,18 @@ auto main(int argc, const char **argv) -> int
 
     for(auto b : builders) b.builder->run(list, b.n);
 
-    UI::GUI::instance->start({.ops_per_second = 100});
+    UI::GUI::instance->start({.ops_per_second = 40});
 
     std::cout << list << '\n';
+
 
     for(auto *s : sorts){
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         UI::GUI::instance->set_algorithm(s);
         s->run(list);
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
     }
 
-    // getchar();
 
     UI::GUI::instance->stop();
 }

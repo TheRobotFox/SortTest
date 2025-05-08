@@ -1,9 +1,0 @@
-[submodule "NoFont"]
-	path = NoFont
-	url = https://github.com/NoHamster/NoFont
-[submodule "List"]
-	path = List
-	url = https://github.com/NoHamster/List
-[submodule "Conscreen"]
-	path = Conscreen
-	url = git@github.com:TheRobotFox/Conscreen

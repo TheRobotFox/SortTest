@@ -5,10 +5,8 @@
 #include <chrono>
 #include <cmath>
 #include <cstddef>
-#include <map>
 #include <list>
 #include <mutex>
-#include <ranges>
 #include <string>
 #include <thread>
 #include <vector>
@@ -108,35 +106,30 @@ namespace UI {
                 break;
             }
         }
-        auto windows_cleanup() -> bool
-        {
-            auto len = windows.size();
-            std::ranges::remove_if(windows, [](auto &w){return w->l.expired();});
-            return len!=windows.size();
-        }
         void windows_map()
         {
-            using namespace std::ranges::views;
-
 
             int count = windows.size();
+            if(count == 0) return;
 
             int cols = ceil(std::sqrt(count)),
-                    y_size = screen_size.bottom/std::ceil((float)count/cols);
+                y_size = screen_size.bottom/std::ceil(count/(float)cols);
 
-            int row = 0;
-            auto it = windows.begin();
-            while(it != windows.end()){
-                int current_cols = std::min(count,cols);
-                int x_size = screen_size.right/current_cols;
-                for(int i = 0; i<current_cols; i++){
-                    it++->get()->rect = {
-                        .left = x_size*i, .top = y_size*row,
-                        .right = x_size*(i+1), .bottom = y_size*(row+1)
-                    };
+            int row = 0, current_cols = 0, x_size, i=0;
+            for(auto& win : windows){
+                if(current_cols==0){
+                    current_cols = std::min(count,cols);
+                    x_size = screen_size.right/current_cols;
+                    count-=current_cols;
+                    i=0;
+                    row++;
                 }
-                count-=current_cols;
-                row++;
+                win->rect = {
+                .left = x_size*i, .top = y_size*(row-1),
+                    .right = x_size*(i+1), .bottom = y_size*row
+                };
+                current_cols--;
+                i++;
             }
         }
 
@@ -169,8 +162,10 @@ namespace UI {
                 Color col;
 
                 // set marked color
-                if(list->marks.contains(index))
-                    col=list->marks[index];
+                if(list->m.last_assigned[0]==&list->at(index))
+                    col= {.r = 200, .g = 20, .b = 30};
+                else if(list->m.last_assigned[1]==&list->at(index))
+                    col= {.r = 200, .g = 180, .b = 10};
                 else
                     col=w.style.foreground;
 
@@ -190,13 +185,14 @@ namespace UI {
 
         void render()
         {
-            mtx.lock();
             static Rect screen_size_last = {};
 
+            mtx.lock();
             screen_size = get_screen_dimensions();
 
-            if(windows_cleanup() // remove dead windows
-               || screen_size!=screen_size_last)
+            if((windows.remove_if([](auto &win){
+                return win->l.expired();
+            }) != 0U) || screen_size!=screen_size_last)
                 windows_map();
 
             screen_size_last = screen_size;
@@ -216,9 +212,7 @@ namespace UI {
                 draw_text(text_rect, win->title);
 
                 // Draw List
-                std::shared_ptr<List> list = win->l.lock();
-                if(!list) continue;
-
+                if(auto list = win->l.lock())
                 {
                     std::lock_guard<std::mutex> g(list->mtx);
                     render_window_list(*win, list);
@@ -263,12 +257,15 @@ namespace UI {
 
         auto create_window(std::weak_ptr<List> l) -> std::weak_ptr<Window>
         {
-            std::lock_guard<std::mutex> g(mtx);
             auto win = std::make_shared<Window>();
             win->l = std::move(l);
-            windows.emplace_back(win);
 
-            windows_cleanup();
+            std::lock_guard<std::mutex> g(mtx);
+
+            windows.remove_if([](auto &win){
+                return win->l.expired();
+            });
+            windows.emplace_back(win);
             windows_map();
 
             return win;
