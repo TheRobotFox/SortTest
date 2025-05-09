@@ -6,6 +6,7 @@
 #include <exception>
 #include <functional>
 #include <list>
+#include <memory>
 #include <mutex>
 #include <string>
 
@@ -57,7 +58,7 @@ class GUI
 
     size_t skip_frames=0; // TODO factor out Render
 
-    const SortAlgorithm *current;
+    std::shared_ptr<const SortAlgorithm> current;
     std::list<std::shared_ptr<Window>> windows;
 
     void handle_inputs();
@@ -107,7 +108,7 @@ public:
 
     auto set_speed(float ops) -> size_t;
 
-    void set_algorithm(const SortAlgorithm &algorithm);
+        void set_algorithm(std::shared_ptr<const SortAlgorithm>);
 
     virtual ~GUI() = default;
 };

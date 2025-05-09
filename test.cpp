@@ -2,13 +2,10 @@
 #include "argparse.hpp"
 #include "Sort.hpp"
 #include <algorithm>
-#include <ranges>
-#include <chrono>
 #include <iostream>
 #include <iterator>
 #include <memory>
 #include <raylib.h>
-#include <thread>
 #include "SortList.hpp"
 
 struct Builder {
@@ -27,7 +24,7 @@ struct ArgParse<P>
         for(const InstanceBuilder<T> &e : T::all){
             if(e.name==name){
 
-                val = std::move(e.get());
+                val = std::move(e.template get<P>());
                 return true;
             }
         }
@@ -55,12 +52,12 @@ struct ArgParse<Builder>
 auto main(int argc, const char **argv) -> int
 {
     std::vector<Builder> builders;
-    std::vector<std::unique_ptr<SortAlgorithm>> sorts;
+    std::vector<std::shared_ptr<SortAlgorithm>> sorts;
     std::vector<T> list;
     std::optional<float> operations_per_second {};
 
     std::ranges::transform(SortAlgorithm::all, std::back_inserter(sorts),
-                            [](const auto& i){return i.get();});
+                           [](const auto& i){return i.template get<std::shared_ptr<SortAlgorithm>>();});
     ArgParser ap(argc, argv,
                  Arg(list, 'l', "read List from argument"),
                  Arg(builders, 'c', "create List using Builders"),
@@ -86,7 +83,7 @@ auto main(int argc, const char **argv) -> int
 
     try {
         for(auto &s : sorts){
-            GUI::instance->set_algorithm(*s);
+            GUI::instance->set_algorithm(s);
             GUI::instance->set_speed(ops);
             s->run(list);
         }

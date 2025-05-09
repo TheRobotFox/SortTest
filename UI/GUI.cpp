@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <cstdlib>
 #include <thread>
+#include <utility>
 #include "../Sort.hpp"
 
 using namespace UI;
@@ -201,8 +202,8 @@ auto GUI::create_window(std::weak_ptr<List> l) -> std::weak_ptr<Window>
 
     return win;
 }
-void GUI::set_algorithm(const SortAlgorithm &algorithm)
+void GUI::set_algorithm(std::shared_ptr<const SortAlgorithm> algo)
 {
     std::lock_guard<std::mutex> g(mtx);
-    current = &algorithm;
+    current = algo;
 }

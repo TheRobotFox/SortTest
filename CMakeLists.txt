@@ -5,7 +5,7 @@ project(SortTest)
 set(CMAKE_CXX_STANDARD 26)
 
 set(CMAKE_INSTALL_PREFIX ${PROJECT_SOURCE_DIR})
-set(CMAKE_CXX_FLAGS "-g -fsanitize=address")
+set(CMAKE_CXX_FLAGS "-ggdb")
 set(CMAKE_CXX_COMPILER "clang++")
 
 # add_executable(SortTest SortList.cpp SortTest.cpp Algorithms/BubbleSort.cpp)

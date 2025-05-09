@@ -2,13 +2,22 @@
 
 #include <functional>
 #include <memory>
+#include <utility>
 #include <vector>
 
+
 template<class T>
-struct InstanceBuilder {
+class InstanceBuilder {
+
+    const std::function<T*()> construct;
+public:
+    InstanceBuilder(std::string name, std::string description, std::function<T*()> c)
+        : name(std::move(name)), description(std::move(description)), construct(c)
+    {}
     const std::string name;
     const std::string description;
-    const std::function<std::unique_ptr<T>()> get;
+    template<class P>
+    constexpr auto get() const -> P {return P(construct());}
     constexpr auto describe() const -> std::string
     {
         if(description.empty()) return name;
@@ -22,7 +31,7 @@ struct Factory {
     template<class C>
     constexpr auto add(std::string name, std::string description = {}) -> Factory<T>&
     {
-        done.emplace_back(name, description, []{return std::make_unique<C>();});
+        done.emplace_back(name, description, []{return new C();});
         return *this;
     }
 };

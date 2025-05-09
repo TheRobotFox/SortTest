@@ -5,4 +5,5 @@
 - Conscreen Integration
 - NoFont Integration
 - Add Stat display
-- Fix QuickSort same value
+- QuickSort Still kinda broken wtf
+- Mutex on List Elements?
