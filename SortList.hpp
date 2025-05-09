@@ -105,9 +105,11 @@ public:
     List(R list, Stats& s)
         : s(s)
     {
-        max = std::ranges::max(list);
-        std::ranges::transform(list, std::back_inserter(this->list),
-                               [this,&s](T i){return ElementCounter(i,&s,&m);});
+        if(!std::ranges::empty(list)){
+            max = std::ranges::max(list);
+            std::ranges::transform(list, std::back_inserter(this->list),
+                                [this,&s](T i){return ElementCounter(i,&s,&m);});
+        }
     }
     List(Stats &s)
         : s(s),

@@ -4,3 +4,5 @@
 - Add Algorithms
 - Conscreen Integration
 - NoFont Integration
+- Add Stat display
+- Fix QuickSort same value

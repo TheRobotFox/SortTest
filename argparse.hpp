@@ -48,7 +48,7 @@ struct ArgParse<std::optional<T>> {
     auto operator()(const char* text, std::optional<T>& val) -> bool
     {
         T tmp;
-        bool res = ArgParse<T>().parse(text, tmp);
+        bool res = ArgParse<T>()(text, tmp);
         val = tmp;
         return res;
     }

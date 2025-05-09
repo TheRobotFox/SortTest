@@ -2,9 +2,7 @@
 #include <chrono>
 #include <cmath>
 #include <cstddef>
-#include <cstdint>
 #include <cstdlib>
-#include <stdexcept>
 #include <thread>
 #include "../Sort.hpp"
 
@@ -21,6 +19,7 @@ auto GUI::start(Config conf) -> bool
 }
 void GUI::stop()
 {
+    if(state != State::CREATED) return;
     state = State::DESTROYED;
     destroy();
 }

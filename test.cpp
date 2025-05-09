@@ -56,11 +56,15 @@ auto main(int argc, const char **argv) -> int
 {
     std::vector<Builder> builders;
     std::vector<std::unique_ptr<SortAlgorithm>> sorts;
+    std::vector<T> list;
+    std::optional<float> operations_per_second {};
 
     std::ranges::transform(SortAlgorithm::all, std::back_inserter(sorts),
                             [](const auto& i){return i.get();});
     ArgParser ap(argc, argv,
-                 Arg(builders, 'c', "create List using Builders", true),
+                 Arg(list, 'l', "read List from argument"),
+                 Arg(builders, 'c', "create List using Builders"),
+                 Arg(operations_per_second, 'v', "Visualisation operations per second"),
                  Arg(sorts, 'a', "List of Algorithms to run"));
 
 
@@ -69,18 +73,21 @@ auto main(int argc, const char **argv) -> int
         std::cout << "Failed paring Args!" << '\n';
         return -1;
     }
-
-    std::vector<T> list;
     for(auto &b : builders) b.builder->run(list, b.n);
 
-    GUI::instance->start({.ops_per_second = 60});
+    if(list.empty()){
+        std::cout << "WARNING: List is empty! Use -h to see how to create one\n";
+    }
+
+    float ops = operations_per_second.value_or(0);
+    if(operations_per_second) GUI::instance->start({.ops_per_second = ops});
 
     std::cout << list << '\n';
 
     try {
         for(auto &s : sorts){
             GUI::instance->set_algorithm(*s);
-            GUI::instance->set_speed(60);
+            GUI::instance->set_speed(ops);
             s->run(list);
         }
     } catch(GUI::ExitRequest &e){

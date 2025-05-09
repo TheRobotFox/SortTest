@@ -8,8 +8,8 @@ void quick_sort(List &l, List::Iterator first, List::Iterator last)
     ElementCounter pivot = *(first+(last-first)/2);
 
     while(left<right){
-        while(*left<pivot) left++;
-        while(*right>pivot) right--;
+        while(*left<=pivot) left++;
+        while(*right>=pivot) right--;
 
         if(left<right) l.swap(left, right);
         else break;

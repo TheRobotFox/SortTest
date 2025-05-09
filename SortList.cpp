@@ -168,10 +168,8 @@ struct Random : ListBuilder
     {
         using namespace std::ranges;
 
-        std::vector<T> tmp(0, n);
-        // generate_random(tmp, gen_rand);
-
-        copy(tmp, std::back_inserter(l));
+        auto dist = std::uniform_int_distribution<T>(1,scale*n);
+        while(n--) l.push_back(dist(gen_rand));
     }
 };
 struct FillReversed : ListBuilder
