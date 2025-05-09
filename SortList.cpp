@@ -86,7 +86,7 @@ auto List::swap(Iterator a, Iterator b) -> void
     if(a>=list.end() || b>=list.end())
         throw std::out_of_range("List index OOB in swap!");
 
-    const auto& tmp = *a;
+    auto tmp = *a;
     *a = *b;
     *b = tmp;
 }
