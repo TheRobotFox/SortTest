@@ -86,7 +86,7 @@ auto List::swap(Iterator a, Iterator b) -> void
     if(a>=list.end() || b>=list.end())
         throw std::out_of_range("List index OOB in swap!");
 
-    auto tmp = *a;
+    const auto& tmp = *a;
     *a = *b;
     *b = tmp;
 }
@@ -96,13 +96,14 @@ void List::remove(Iterator a)
     if(a>= list.end())
         throw std::out_of_range("List a OOB in remove!");
 
-    bool dirty_max = max == a->elem;
     if(a<end()-1){
         mtx.lock();
 
-        a->elem = std::numeric_limits<T>::min();
-        namespace r = std::ranges;
-        max = r::max(list | r::views::transform([](ElementCounter& e){return e.elem;}));
+        if(a->elem==max){
+            a->elem = std::numeric_limits<T>::min();
+            namespace r = std::ranges;
+            max = r::max(list | r::views::transform([](ElementCounter& e){return e.elem;}));
+        }
 
         mtx.unlock();
 

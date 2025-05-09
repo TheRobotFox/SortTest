@@ -78,6 +78,12 @@ public:
     auto operator<(ElementCounter &other) -> bool;
     auto operator>=(ElementCounter &other) -> bool;
     auto operator<=(ElementCounter &other) -> bool;
+
+    auto operator==(const ElementCounter &other) -> bool = delete;
+    auto operator>(const ElementCounter &other) -> bool = delete;
+    auto operator<(const ElementCounter &other) -> bool = delete;
+    auto operator>=(const ElementCounter &other) -> bool = delete;
+    auto operator<=(const ElementCounter &other) -> bool = delete;
     auto read() -> T;
 };
 

@@ -52,11 +52,27 @@ class ReculinSort : public SortAlgorithm
     {}
 };
 
+class GulagSort : public SortAlgorithm
+{
+    auto sort(List &l) -> void override;
+    public:
+    GulagSort() : SortAlgorithm("GulagSort")
+    {}
+};
+
 class QuickSort : public SortAlgorithm
 {
     auto sort(List &l) -> void override;
     public:
     QuickSort() : SortAlgorithm("QuickSort")
+    {}
+};
+
+class TooManyCocktails : public SortAlgorithm
+{
+    auto sort(List &l) -> void override;
+    public:
+    TooManyCocktails() : SortAlgorithm("TooManyCocktails")
     {}
 };
 
@@ -74,4 +90,7 @@ inline const std::vector<InstanceBuilder<SortAlgorithm>> SortAlgorithm::all = SF
     .add<StalinSort>("Everyone out of order is sent on Holiday")
     .add<ReculinSort>("Recursive StalinSort")
     .add<QuickSort>("The Classic")
+    .add<SelectionSort>("The Chosen One")
+    .add<GulagSort>("Recursive StalinSort Extended")
+    .add<TooManyCocktails>("Bogosort on too many Cocktails ")
     .done;

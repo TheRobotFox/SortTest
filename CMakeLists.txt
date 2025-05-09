@@ -19,6 +19,9 @@ add_executable(SortTest
   Algorithms/StalinSort.cpp
   Algorithms/QuickSort.cpp
   Algorithms/ReculinSort.cpp
+  Algorithms/GulagSort.cpp
+  Algorithms/SelectionSort.cpp
+  Algorithms/TooManyCocktails.cpp
 )
 
 target_link_libraries(SortTest -lraylib)

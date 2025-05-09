@@ -43,10 +43,9 @@ public:
         sort(*list);
         bool res = list->verify();
         std::cout << *list << '\n';
+        std::cout << s.comps << '\n';
         return res;
     }
 
     virtual ~SortAlgorithm() = default;
 };
-
-void status_reset();
